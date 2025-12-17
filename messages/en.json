@@ -1,0 +1,64 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back"
+  },
+  "home": {
+    "title": "Colombian Parqués",
+    "subtitle": "The classic Colombian board game",
+    "createGame": "Create Game",
+    "joinGame": "Join Game",
+    "publicGames": "View public games",
+    "playerName": "Your name",
+    "roomCode": "Room code",
+    "enterName": "Enter your name",
+    "enterCode": "6-character code"
+  },
+  "room": {
+    "lobby": "Waiting Room",
+    "roomCode": "Room code",
+    "copyCode": "Copy code",
+    "clickToCopy": "click to copy",
+    "creating": "Creating room...",
+    "joining": "Joining room...",
+    "pleaseWait": "Please wait",
+    "backHome": "Back to home",
+    "toggleReady": "Toggle ready",
+    "needMorePlayers": "At least 2 players are needed and all must be ready to start.",
+    "howToPlay": "How to play",
+    "instruction1": "Share the code with your friends so they can join.",
+    "instruction2": "All players must mark themselves 'Ready' (except the host).",
+    "instruction3": "The host can start the game when everyone is ready."
+  },
+  "game": {
+    "waiting": "Waiting for players...",
+    "ready": "Ready",
+    "notReady": "Not ready",
+    "start": "Start Game",
+    "leave": "Leave",
+    "rollDice": "Roll Dice",
+    "pass": "Pass",
+    "yourTurn": "Your turn!",
+    "waitingTurn": "Waiting for turn...",
+    "winner": "Winner!",
+    "gameOver": "Game Over"
+  },
+  "chat": {
+    "placeholder": "Type a message...",
+    "send": "Send"
+  },
+  "errors": {
+    "roomNotFound": "Room not found",
+    "roomFull": "Room is full",
+    "gameStarted": "Game already started",
+    "invalidCode": "Invalid code",
+    "connectionError": "Connection error"
+  }
+}

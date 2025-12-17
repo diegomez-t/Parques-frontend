@@ -1,0 +1,64 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "back": "Volver"
+  },
+  "home": {
+    "title": "Parqués Colombiano",
+    "subtitle": "El clásico juego de mesa colombiano",
+    "createGame": "Crear Partida",
+    "joinGame": "Unirse a Partida",
+    "publicGames": "Ver partidas públicas",
+    "playerName": "Tu nombre",
+    "roomCode": "Código de sala",
+    "enterName": "Ingresa tu nombre",
+    "enterCode": "Código de 6 caracteres"
+  },
+  "room": {
+    "lobby": "Sala de Espera",
+    "roomCode": "Código de sala",
+    "copyCode": "Copiar código",
+    "clickToCopy": "clic para copiar",
+    "creating": "Creando sala...",
+    "joining": "Uniéndose a la sala...",
+    "pleaseWait": "Por favor espera",
+    "backHome": "Volver al inicio",
+    "toggleReady": "Marcar como listo",
+    "needMorePlayers": "Se necesitan al menos 2 jugadores y todos deben estar listos para iniciar.",
+    "howToPlay": "Cómo jugar",
+    "instruction1": "Comparte el código con tus amigos para que se unan.",
+    "instruction2": "Todos los jugadores deben marcar 'Listo' (excepto el host).",
+    "instruction3": "El host puede iniciar la partida cuando todos estén listos."
+  },
+  "game": {
+    "waiting": "Esperando jugadores...",
+    "ready": "Listo",
+    "notReady": "No listo",
+    "start": "Iniciar Partida",
+    "leave": "Salir",
+    "rollDice": "Lanzar Dados",
+    "pass": "Pasar",
+    "yourTurn": "¡Tu turno!",
+    "waitingTurn": "Esperando turno...",
+    "winner": "¡Ganador!",
+    "gameOver": "Fin del Juego"
+  },
+  "chat": {
+    "placeholder": "Escribe un mensaje...",
+    "send": "Enviar"
+  },
+  "errors": {
+    "roomNotFound": "Sala no encontrada",
+    "roomFull": "La sala está llena",
+    "gameStarted": "La partida ya comenzó",
+    "invalidCode": "Código inválido",
+    "connectionError": "Error de conexión"
+  }
+}

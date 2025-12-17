@@ -1,0 +1,64 @@
+{
+  "common": {
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "back": "Retour"
+  },
+  "home": {
+    "title": "Parqués Colombien",
+    "subtitle": "Le jeu de plateau colombien classique",
+    "createGame": "Créer une partie",
+    "joinGame": "Rejoindre une partie",
+    "publicGames": "Voir les parties publiques",
+    "playerName": "Votre nom",
+    "roomCode": "Code de salle",
+    "enterName": "Entrez votre nom",
+    "enterCode": "Code à 6 caractères"
+  },
+  "room": {
+    "lobby": "Salle d'attente",
+    "roomCode": "Code de salle",
+    "copyCode": "Copier le code",
+    "clickToCopy": "cliquez pour copier",
+    "creating": "Création de la salle...",
+    "joining": "Connexion à la salle...",
+    "pleaseWait": "Veuillez patienter",
+    "backHome": "Retour à l'accueil",
+    "toggleReady": "Marquer comme prêt",
+    "needMorePlayers": "Il faut au moins 2 joueurs et tous doivent être prêts pour démarrer.",
+    "howToPlay": "Comment jouer",
+    "instruction1": "Partagez le code avec vos amis pour qu'ils rejoignent.",
+    "instruction2": "Tous les joueurs doivent se marquer 'Prêt' (sauf l'hôte).",
+    "instruction3": "L'hôte peut démarrer la partie quand tout le monde est prêt."
+  },
+  "game": {
+    "waiting": "En attente de joueurs...",
+    "ready": "Prêt",
+    "notReady": "Pas prêt",
+    "start": "Démarrer la partie",
+    "leave": "Quitter",
+    "rollDice": "Lancer les dés",
+    "pass": "Passer",
+    "yourTurn": "Votre tour !",
+    "waitingTurn": "En attente du tour...",
+    "winner": "Gagnant !",
+    "gameOver": "Fin de partie"
+  },
+  "chat": {
+    "placeholder": "Tapez un message...",
+    "send": "Envoyer"
+  },
+  "errors": {
+    "roomNotFound": "Salle introuvable",
+    "roomFull": "Salle pleine",
+    "gameStarted": "Partie déjà commencée",
+    "invalidCode": "Code invalide",
+    "connectionError": "Erreur de connexion"
+  }
+}
