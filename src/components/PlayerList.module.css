@@ -1,0 +1,142 @@
+/* ==========================================================================
+   PLAYER LIST COMPONENT STYLES
+   ========================================================================== */
+
+.container {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-md);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.emptyState {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+/* --------------------------------------------------------------------------
+   PLAYER ITEM
+   -------------------------------------------------------------------------- */
+
+.playerItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md);
+  background: var(--color-surface-muted);
+  border-radius: var(--radius-md);
+  transition: background-color var(--transition-fast);
+}
+
+.playerItem:hover {
+  background: var(--color-surface-hover);
+}
+
+.playerInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+/* --------------------------------------------------------------------------
+   AVATAR
+   -------------------------------------------------------------------------- */
+
+.avatar {
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-sm);
+}
+
+/* Player color variants */
+.avatarRed { background-color: var(--game-red); }
+.avatarBlue { background-color: var(--game-blue); }
+.avatarGreen { background-color: var(--game-green); }
+.avatarYellow { background-color: var(--game-yellow); color: #1a1a2e; }
+.avatarPurple { background-color: var(--game-purple); }
+.avatarOrange { background-color: var(--game-orange); }
+
+/* --------------------------------------------------------------------------
+   PLAYER DETAILS
+   -------------------------------------------------------------------------- */
+
+.playerDetails {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.playerNameRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.playerName {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+.hostBadge {
+  font-size: var(--font-size-xs);
+  padding: 0.125rem 0.5rem;
+  background: rgba(245, 158, 11, 0.2);
+  color: var(--color-warning);
+  border-radius: var(--radius-sm);
+}
+
+.connectionStatus {
+  font-size: var(--font-size-xs);
+}
+
+.statusConnected {
+  color: var(--color-success);
+}
+
+.statusDisconnected {
+  color: var(--color-danger);
+}
+
+/* --------------------------------------------------------------------------
+   READY STATUS
+   -------------------------------------------------------------------------- */
+
+.readyStatus {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-full);
+}
+
+.readyStatusReady {
+  composes: readyStatus;
+  background: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.readyStatusNotReady {
+  composes: readyStatus;
+  background: var(--color-surface-active);
+  color: var(--color-text-muted);
+}
+

@@ -1,0 +1,54 @@
+/* ==========================================================================
+   PAWN COMPONENT STYLES
+   ========================================================================== */
+
+.pawn {
+  transition: transform var(--transition-normal);
+}
+
+.pawnMovable {
+  cursor: pointer;
+}
+
+.pawnMovable:hover {
+  transform: scale(1.1);
+}
+
+.pawnSelected {
+  animation: bounce 1s infinite;
+}
+
+/* --------------------------------------------------------------------------
+   SELECTION INDICATOR
+   -------------------------------------------------------------------------- */
+
+.selectionRing {
+  animation: spin 3s linear infinite;
+}
+
+.movableRing {
+  /* Subtle indicator for movable pawns */
+}
+
+/* --------------------------------------------------------------------------
+   ANIMATIONS
+   -------------------------------------------------------------------------- */
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
