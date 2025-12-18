@@ -1,0 +1,356 @@
+/* ==========================================================================
+   ROOM PAGES SHARED STYLES
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   MAIN LAYOUTS
+   -------------------------------------------------------------------------- */
+
+.main {
+  min-height: 100vh;
+  padding: var(--space-md);
+  background: var(--gradient-bg);
+}
+
+.mainCentered {
+  composes: main;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl);
+}
+
+.container {
+  max-width: 80rem;
+  margin: 0 auto;
+}
+
+.containerNarrow {
+  max-width: 28rem;
+  width: 100%;
+}
+
+/* --------------------------------------------------------------------------
+   CARD STYLES
+   -------------------------------------------------------------------------- */
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-lg);
+}
+
+.cardTransparent {
+  composes: card;
+  background: rgba(var(--color-surface), 0.5);
+  backdrop-filter: blur(8px);
+}
+
+.cardCenter {
+  composes: card;
+  text-align: center;
+}
+
+/* --------------------------------------------------------------------------
+   ERROR STATE
+   -------------------------------------------------------------------------- */
+
+.errorTitle {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-danger);
+  margin-bottom: var(--space-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+}
+
+.errorMessage {
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-lg);
+}
+
+/* --------------------------------------------------------------------------
+   LOADING STATE
+   -------------------------------------------------------------------------- */
+
+.loadingWrapper {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.loadingIcon {
+  width: 4rem;
+  height: 4rem;
+  margin: 0 auto var(--space-md);
+  border-radius: var(--radius-full);
+  background: rgba(59, 130, 246, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+}
+
+.loadingTitle {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-sm);
+}
+
+.loadingText {
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   HEADER
+   -------------------------------------------------------------------------- */
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+.headerGame {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.headerTitle {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.lobbyTitle {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.roomCodeSection {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.roomCodeLabel {
+  color: var(--color-text-muted);
+}
+
+.roomCodeBadge {
+  padding: 0.75rem 1rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  letter-spacing: 0.15em;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.roomCodeBadge:hover {
+  background: var(--color-surface-hover);
+  border-color: var(--color-border-light);
+}
+
+.roomCodeBadgeSmall {
+  composes: roomCodeBadge;
+  padding: 0.375rem 0.75rem;
+  font-size: var(--font-size-sm);
+}
+
+.roomCodeHint {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-disabled);
+}
+
+/* --------------------------------------------------------------------------
+   CONTENT GRID
+   -------------------------------------------------------------------------- */
+
+.contentGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-lg);
+}
+
+.contentMain {
+  grid-column: span 2;
+}
+
+/* --------------------------------------------------------------------------
+   ACTIONS
+   -------------------------------------------------------------------------- */
+
+.actionsSection {
+  margin-top: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* --------------------------------------------------------------------------
+   WARNING BOX
+   -------------------------------------------------------------------------- */
+
+.warningBox {
+  padding: var(--space-md);
+  background: var(--color-warning-bg);
+  border: 1px solid var(--color-warning-border);
+  border-radius: var(--radius-md);
+}
+
+.warningText {
+  color: var(--color-warning);
+  font-size: var(--font-size-sm);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+/* --------------------------------------------------------------------------
+   INSTRUCTIONS BOX
+   -------------------------------------------------------------------------- */
+
+.instructionsBox {
+  composes: card;
+  margin-top: var(--space-lg);
+  background: rgba(var(--color-surface), 0.5);
+}
+
+.instructionsTitle {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.instructionsList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.instructionItem {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+/* --------------------------------------------------------------------------
+   BUTTONS
+   -------------------------------------------------------------------------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: 0.75rem 1.5rem;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  font-family: inherit;
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all var(--transition-normal);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btnPrimary {
+  composes: btn;
+  background: var(--color-primary);
+  color: var(--color-primary-foreground);
+}
+
+.btnPrimary:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btnSecondary {
+  composes: btn;
+  background: var(--color-secondary);
+  color: var(--color-secondary-foreground);
+}
+
+.btnSecondary:hover:not(:disabled) {
+  background: var(--color-secondary-hover);
+}
+
+.btnLarge {
+  padding: 1rem 2rem;
+  font-size: var(--font-size-lg);
+}
+
+.btnFlex {
+  flex: 1;
+}
+
+.btnSmall {
+  padding: 0.5rem 1rem;
+  font-size: var(--font-size-sm);
+}
+
+/* --------------------------------------------------------------------------
+   RESPONSIVE
+   -------------------------------------------------------------------------- */
+
+@media (min-width: 768px) {
+  .main {
+    padding: var(--space-xl);
+  }
+
+  .header {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  .actionsSection {
+    flex-direction: row;
+  }
+}
+
+@media (min-width: 1024px) {
+  .contentGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+

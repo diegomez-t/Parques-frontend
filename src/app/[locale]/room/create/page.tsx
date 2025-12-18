@@ -4,11 +4,17 @@ import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
-import { useSocket, useCreateRoom, useLeaveRoom, useGameActions } from "@/hooks/useSocket";
+import {
+  useSocket,
+  useCreateRoom,
+  useLeaveRoom,
+  useGameActions,
+} from "@/hooks/useSocket";
 import { useGameStore } from "@/store/gameStore";
-import { PlayerList } from "@/components/PlayerList";
-import { Chat } from "@/components/Chat";
-import { GameArea } from "@/components/game/GameArea";
+import { PlayerList } from "@/components/PlayerList/PlayerList";
+import { Chat } from "@/components/Chat/Chat";
+import { GameArea } from "@/components/game/GameArea/GameArea";
+import styles from "../room.module.css";
 
 function CreateRoomContent() {
   const t = useTranslations("room");
@@ -16,20 +22,20 @@ function CreateRoomContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const playerName = searchParams.get("name") || "Jugador";
-  
+
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   const socket = useSocket();
   const createRoom = useCreateRoom();
   const leaveRoom = useLeaveRoom();
   const { setReady, startGame } = useGameActions();
-  
+
   const { isConnected, roomCode, players, isHost, gameState } = useGameStore();
-  
+
   const isGameStarted = gameState?.status === "playing";
 
-  // Créer la room au montage
+  // Create room on mount
   useEffect(() => {
     if (!isConnected || roomCode || isCreating) return;
 
@@ -52,8 +58,6 @@ function CreateRoomContent() {
     create();
   }, [isConnected, roomCode, playerName, createRoom, isCreating]);
 
-  // Les événements game:started sont gérés dans useSocket et mettent à jour gameState
-
   const handleLeave = () => {
     leaveRoom();
     router.push("/");
@@ -65,15 +69,20 @@ function CreateRoomContent() {
     }
   };
 
-  const canStart = players.length >= 2 && players.every((p) => p.isReady || p.isHost);
+  const canStart =
+    players.length >= 2 && players.every((p) => p.isReady || p.isHost);
 
+  // Error state
   if (error) {
     return (
-      <main className="min-h-screen flex flex-col items-center justify-center p-8 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-        <div className="card max-w-md w-full text-center">
-          <h1 className="text-2xl font-bold text-red-400 mb-4">❌ Error</h1>
-          <p className="text-slate-300 mb-6">{error}</p>
-          <button onClick={() => router.push("/")} className="btn btn-primary">
+      <main className={styles.mainCentered}>
+        <div className={`${styles.cardCenter} ${styles.containerNarrow}`}>
+          <h1 className={styles.errorTitle}>❌ Error</h1>
+          <p className={styles.errorMessage}>{error}</p>
+          <button
+            onClick={() => router.push("/")}
+            className={styles.btnPrimary}
+          >
             {t("backHome")}
           </button>
         </div>
@@ -81,90 +90,83 @@ function CreateRoomContent() {
     );
   }
 
+  // Loading state
   if (!roomCode) {
     return (
-      <main className="min-h-screen flex flex-col items-center justify-center p-8 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-        <div className="card max-w-md w-full text-center">
-          <div className="animate-pulse">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-500/30 flex items-center justify-center">
-              <span className="text-3xl">🎲</span>
+      <main className={styles.mainCentered}>
+        <div className={`${styles.cardCenter} ${styles.containerNarrow}`}>
+          <div className={styles.loadingWrapper}>
+            <div className={styles.loadingIcon}>
+              <span>🎲</span>
             </div>
-            <h2 className="text-xl font-semibold text-white mb-2">
-              {t("creating")}
-            </h2>
-            <p className="text-slate-400">{t("pleaseWait")}</p>
+            <h2 className={styles.loadingTitle}>{t("creating")}</h2>
+            <p className={styles.loadingText}>{t("pleaseWait")}</p>
           </div>
         </div>
       </main>
     );
   }
 
-  // Affichage du jeu en cours
+  // Game in progress
   if (isGameStarted) {
     return (
-      <main className="min-h-screen p-2 md:p-4 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-        <div className="max-w-7xl mx-auto">
-          {/* Header compact */}
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-4">
-              <h1 className="text-xl font-bold text-white">🎲 Parqués</h1>
-              <span className="px-3 py-1 bg-slate-700 rounded font-mono text-sm text-slate-300">
-                {roomCode}
-              </span>
+      <main className={styles.main}>
+        <div className={styles.container}>
+          <header className={styles.headerGame}>
+            <div className={styles.headerLeft}>
+              <h1 className={styles.headerTitle}>🎲 Parqués</h1>
+              <span className={styles.roomCodeBadgeSmall}>{roomCode}</span>
             </div>
-            <button onClick={handleLeave} className="btn btn-secondary text-sm">
+            <button onClick={handleLeave} className={styles.btnSecondary}>
               {tGame("leave")}
             </button>
-          </div>
+          </header>
 
-          {/* Game Layout */}
           <GameArea />
         </div>
       </main>
     );
   }
 
-  // Lobby d'attente
+  // Lobby
   return (
-    <main className="min-h-screen p-4 md:p-8 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      <div className="max-w-6xl mx-auto">
+    <main className={styles.main}>
+      <div className={styles.container}>
         {/* Header */}
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
+        <header className={styles.header}>
           <div>
-            <h1 className="text-3xl font-bold text-white mb-2">
-              🎲 {t("lobby")}
-            </h1>
-            <div className="flex items-center gap-3">
-              <span className="text-slate-400">{t("roomCode")}:</span>
+            <h1 className={styles.lobbyTitle}>🎲 {t("lobby")}</h1>
+            <div className={styles.roomCodeSection}>
+              <span className={styles.roomCodeLabel}>{t("roomCode")}:</span>
               <button
                 onClick={handleCopyCode}
-                className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg font-mono text-xl text-white tracking-widest transition-colors"
+                className={styles.roomCodeBadge}
                 title={t("copyCode")}
               >
                 {roomCode}
               </button>
-              <span className="text-xs text-slate-500">({t("clickToCopy")})</span>
+              <span className={styles.roomCodeHint}>({t("clickToCopy")})</span>
             </div>
           </div>
-          
-          <button onClick={handleLeave} className="btn btn-secondary">
+
+          <button onClick={handleLeave} className={styles.btnSecondary}>
             ← {tGame("leave")}
           </button>
-        </div>
+        </header>
 
         {/* Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className={styles.contentGrid}>
           {/* Players */}
-          <div className="lg:col-span-2">
+          <div className={styles.contentMain}>
             <PlayerList />
-            
+
             {/* Actions */}
-            <div className="mt-6 flex flex-col sm:flex-row gap-4">
+            <div className={styles.actionsSection}>
               {isHost ? (
                 <button
                   onClick={startGame}
                   disabled={!canStart}
-                  className="btn btn-primary flex-1 text-lg py-4"
+                  className={`${styles.btnPrimary} ${styles.btnLarge} ${styles.btnFlex}`}
                 >
                   🚀 {tGame("start")}
                 </button>
@@ -176,31 +178,27 @@ function CreateRoomContent() {
                       setReady(!myPlayer.isReady);
                     }
                   }}
-                  className="btn btn-primary flex-1 text-lg py-4"
+                  className={`${styles.btnPrimary} ${styles.btnLarge} ${styles.btnFlex}`}
                 >
                   ✓ {t("toggleReady")}
                 </button>
               )}
             </div>
 
-            {/* Debug info */}
+            {/* Warning */}
             {!canStart && players.length >= 2 && (
-              <div className="mt-4 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
-                <p className="text-yellow-400 text-sm">
-                  ⚠️ {t("needMorePlayers")}
-                </p>
+              <div className={styles.warningBox}>
+                <p className={styles.warningText}>⚠️ {t("needMorePlayers")}</p>
               </div>
             )}
 
             {/* Instructions */}
-            <div className="mt-6 card bg-slate-800/50">
-              <h3 className="text-lg font-semibold text-white mb-3">
-                📋 {t("howToPlay")}
-              </h3>
-              <ul className="space-y-2 text-slate-300 text-sm">
-                <li>• {t("instruction1")}</li>
-                <li>• {t("instruction2")}</li>
-                <li>• {t("instruction3")}</li>
+            <div className={styles.instructionsBox}>
+              <h3 className={styles.instructionsTitle}>📋 {t("howToPlay")}</h3>
+              <ul className={styles.instructionsList}>
+                <li className={styles.instructionItem}>• {t("instruction1")}</li>
+                <li className={styles.instructionItem}>• {t("instruction2")}</li>
+                <li className={styles.instructionItem}>• {t("instruction3")}</li>
               </ul>
             </div>
           </div>
@@ -217,13 +215,14 @@ function CreateRoomContent() {
 
 export default function CreateRoomPage() {
   return (
-    <Suspense fallback={
-      <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-        <div className="animate-pulse text-white">Cargando...</div>
-      </main>
-    }>
+    <Suspense
+      fallback={
+        <main className={styles.mainCentered}>
+          <div className={styles.loadingWrapper}>Cargando...</div>
+        </main>
+      }
+    >
       <CreateRoomContent />
     </Suspense>
   );
 }
-

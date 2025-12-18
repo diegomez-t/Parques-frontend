@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
-import { useRouter } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
+import styles from "./page.module.css";
 
 export default function Home() {
   const t = useTranslations("home");
@@ -24,91 +24,90 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-8 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      <div className="max-w-md w-full space-y-8">
-        {/* Logo / Titre */}
-        <div className="text-center">
-          <h1 className="text-5xl font-bold text-white mb-2">
-            🎲 {t("title")}
+    <main className={styles.main}>
+      <div className={styles.container}>
+        {/* Logo / Title */}
+        <div className={styles.header}>
+          <h1 className={styles.title}>
+            <span className={styles.diceIcon}>🎲</span>
+            {t("title")}
           </h1>
-          <p className="text-slate-400">{t("subtitle")}</p>
+          <p className={styles.subtitle}>{t("subtitle")}</p>
         </div>
 
-        {/* Formulaire */}
-        <div className="card space-y-6">
-          {/* Nom du joueur */}
-          <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">
-              {t("playerName")}
-            </label>
-            <input
-              type="text"
-              value={playerName}
-              onChange={(e) => setPlayerName(e.target.value)}
-              placeholder={t("enterName")}
-              className="input"
-              maxLength={20}
-            />
-          </div>
-
-          {/* Actions */}
-          <div className="space-y-4">
-            {/* Créer une partie */}
-            <button
-              onClick={handleCreateGame}
-              disabled={!playerName.trim()}
-              className="btn btn-primary w-full"
-            >
-              🎲 {t("createGame")}
-            </button>
-
-            {/* Séparateur */}
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-slate-700"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-slate-800 text-slate-400">ou</span>
-              </div>
-            </div>
-
-            {/* Rejoindre une partie */}
-            <div className="flex gap-2">
+        {/* Form Card */}
+        <div className={styles.card}>
+          <div className={styles.formGroup}>
+            {/* Player Name */}
+            <div className={styles.fieldGroup}>
+              <label className={styles.label}>{t("playerName")}</label>
               <input
                 type="text"
-                value={roomCode}
-                onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
-                placeholder={t("enterCode")}
-                className="input flex-1"
-                maxLength={6}
+                value={playerName}
+                onChange={(e) => setPlayerName(e.target.value)}
+                placeholder={t("enterName")}
+                className={styles.input}
+                maxLength={20}
               />
+            </div>
+
+            {/* Actions */}
+            <div className={styles.actions}>
+              {/* Create Game */}
               <button
-                onClick={handleJoinGame}
-                disabled={!playerName.trim() || roomCode.length !== 6}
-                className="btn btn-secondary"
+                onClick={handleCreateGame}
+                disabled={!playerName.trim()}
+                className={`${styles.btnPrimary} ${styles.btnFull}`}
               >
-                {t("joinGame")}
+                🎲 {t("createGame")}
               </button>
+
+              {/* Divider */}
+              <div className={styles.divider}>
+                <div className={styles.dividerLine}>
+                  <div className={styles.dividerLineInner} />
+                </div>
+                <div className={styles.dividerText}>
+                  <span className={styles.dividerTextInner}>ou</span>
+                </div>
+              </div>
+
+              {/* Join Game */}
+              <div className={styles.joinGroup}>
+                <input
+                  type="text"
+                  value={roomCode}
+                  onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
+                  placeholder={t("enterCode")}
+                  className={styles.inputFlex}
+                  maxLength={6}
+                />
+                <button
+                  onClick={handleJoinGame}
+                  disabled={!playerName.trim() || roomCode.length !== 6}
+                  className={styles.btnSecondary}
+                >
+                  {t("joinGame")}
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Parties publiques */}
-        <div className="text-center">
-          <Link
-            href="/rooms"
-            className="text-blue-400 hover:text-blue-300 text-sm"
-          >
+        {/* Public Games Link */}
+        <div className={styles.footerLinks}>
+          <Link href="/rooms" className={styles.footerLink}>
             {t("publicGames")} →
           </Link>
         </div>
 
         {/* Footer */}
-        <p className="text-center text-slate-500 text-xs">
-          Parqués Colombiano - Juego de mesa tradicional
-        </p>
+        <footer className={styles.footer}>
+          <p className={styles.footerText}>
+            Parqués Colombiano - Juego de mesa tradicional
+          </p>
+        </footer>
       </div>
     </main>
   );
 }
-

@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useGameStore } from "@/store/gameStore";
 import { useGameActions } from "@/hooks/useSocket";
-import { cn } from "@/lib/utils";
+import styles from "./Chat.module.css";
 
 export function Chat() {
   const t = useTranslations("chat");
@@ -26,28 +26,21 @@ export function Chat() {
   };
 
   return (
-    <div className="card flex flex-col h-80">
+    <div className={styles.container}>
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto space-y-2 mb-4">
+      <div className={styles.messages}>
         {messages.length === 0 ? (
-          <p className="text-center text-slate-500 text-sm py-4">
-            Sin mensajes aún...
-          </p>
+          <p className={styles.emptyState}>Sin mensajes aún...</p>
         ) : (
           messages.map((msg) => (
             <div
               key={msg.id}
-              className={cn(
-                "text-sm",
-                msg.isSystem && "text-slate-400 italic text-center"
-              )}
+              className={msg.isSystem ? styles.messageSystem : styles.message}
             >
               {!msg.isSystem && (
-                <span className="font-semibold text-blue-400">
-                  {msg.playerName}:{" "}
-                </span>
+                <span className={styles.messageAuthor}>{msg.playerName}: </span>
               )}
-              <span className={msg.isSystem ? "" : "text-slate-300"}>
+              <span className={msg.isSystem ? undefined : styles.messageContent}>
                 {msg.message}
               </span>
             </div>
@@ -57,19 +50,19 @@ export function Chat() {
       </div>
 
       {/* Input */}
-      <form onSubmit={handleSubmit} className="flex gap-2">
+      <form onSubmit={handleSubmit} className={styles.form}>
         <input
           type="text"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder={t("placeholder")}
-          className="input flex-1"
+          className={styles.input}
           maxLength={500}
         />
         <button
           type="submit"
           disabled={!message.trim()}
-          className="btn btn-primary"
+          className={styles.sendButton}
         >
           {t("send")}
         </button>
@@ -77,4 +70,3 @@ export function Chat() {
     </div>
   );
 }
-

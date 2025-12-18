@@ -1,0 +1,242 @@
+/* ==========================================================================
+   DESIGN TOKENS - PARQUÉS COLOMBIANO
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   GAME COLORS (invariants - same in both themes)
+   -------------------------------------------------------------------------- */
+:root {
+  /* Player colors - bold and vibrant */
+  --game-red: #e53935;
+  --game-red-light: #ff6f60;
+  --game-red-dark: #ab000d;
+  
+  --game-blue: #1e88e5;
+  --game-blue-light: #6ab7ff;
+  --game-blue-dark: #005cb2;
+  
+  --game-green: #43a047;
+  --game-green-light: #76d275;
+  --game-green-dark: #00701a;
+  
+  --game-yellow: #fdd835;
+  --game-yellow-light: #ffff6b;
+  --game-yellow-dark: #c6a700;
+  
+  --game-purple: #8e24aa;
+  --game-purple-light: #c158dc;
+  --game-purple-dark: #5c007a;
+  
+  --game-orange: #fb8c00;
+  --game-orange-light: #ffbd45;
+  --game-orange-dark: #c25e00;
+
+  /* Spacing scale */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  --space-3xl: 4rem;
+
+  /* Border radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 200ms ease;
+  --transition-slow: 300ms ease;
+
+  /* Typography */
+  --font-family: 'DM Sans', 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 2rem;
+  --font-size-4xl: 2.5rem;
+  --font-size-5xl: 3rem;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Shadows (theme-dependent, defined below) */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+/* --------------------------------------------------------------------------
+   DARK THEME (default)
+   -------------------------------------------------------------------------- */
+[data-theme="dark"] {
+  /* Base colors */
+  --color-bg-primary: #0c1222;
+  --color-bg-secondary: #151d2f;
+  --color-bg-tertiary: #1e293b;
+  --color-bg-elevated: #253044;
+  
+  /* Surface colors */
+  --color-surface: #1e293b;
+  --color-surface-hover: #2d3d55;
+  --color-surface-active: #374863;
+  --color-surface-muted: #151d2f;
+  
+  /* Border colors */
+  --color-border: #334155;
+  --color-border-light: #475569;
+  --color-border-focus: #3b82f6;
+  
+  /* Text colors */
+  --color-text-primary: #f8fafc;
+  --color-text-secondary: #cbd5e1;
+  --color-text-muted: #94a3b8;
+  --color-text-disabled: #64748b;
+  --color-text-inverse: #0f172a;
+  
+  /* Brand/Accent colors */
+  --color-primary: #3b82f6;
+  --color-primary-hover: #2563eb;
+  --color-primary-light: #60a5fa;
+  --color-primary-foreground: #ffffff;
+  
+  --color-secondary: #475569;
+  --color-secondary-hover: #64748b;
+  --color-secondary-foreground: #f8fafc;
+  
+  /* Semantic colors */
+  --color-success: #22c55e;
+  --color-success-bg: rgba(34, 197, 94, 0.1);
+  --color-success-border: rgba(34, 197, 94, 0.3);
+  
+  --color-warning: #f59e0b;
+  --color-warning-bg: rgba(245, 158, 11, 0.1);
+  --color-warning-border: rgba(245, 158, 11, 0.3);
+  
+  --color-danger: #ef4444;
+  --color-danger-bg: rgba(239, 68, 68, 0.1);
+  --color-danger-border: rgba(239, 68, 68, 0.3);
+  
+  --color-info: #3b82f6;
+  --color-info-bg: rgba(59, 130, 246, 0.1);
+  --color-info-border: rgba(59, 130, 246, 0.3);
+  
+  /* Input colors */
+  --color-input-bg: #253044;
+  --color-input-border: #475569;
+  --color-input-focus: #3b82f6;
+  --color-input-placeholder: #64748b;
+  
+  /* Special backgrounds */
+  --gradient-bg: linear-gradient(135deg, #0c1222 0%, #151d2f 50%, #0c1222 100%);
+  --gradient-card: linear-gradient(145deg, #1e293b 0%, #253044 100%);
+  --gradient-accent: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  
+  /* Board specific */
+  --color-board-bg: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+  --color-cell: #2d3748;
+  --color-cell-border: #4a5568;
+  --color-cell-safe: #4a5568;
+  --color-cell-safe-border: #68d391;
+  
+  /* Shadows for dark theme */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0 / 0.4);
+  --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.3);
+}
+
+/* --------------------------------------------------------------------------
+   LIGHT THEME
+   -------------------------------------------------------------------------- */
+[data-theme="light"] {
+  /* Base colors */
+  --color-bg-primary: #f8fafc;
+  --color-bg-secondary: #f1f5f9;
+  --color-bg-tertiary: #e2e8f0;
+  --color-bg-elevated: #ffffff;
+  
+  /* Surface colors */
+  --color-surface: #ffffff;
+  --color-surface-hover: #f1f5f9;
+  --color-surface-active: #e2e8f0;
+  --color-surface-muted: #f8fafc;
+  
+  /* Border colors */
+  --color-border: #e2e8f0;
+  --color-border-light: #cbd5e1;
+  --color-border-focus: #3b82f6;
+  
+  /* Text colors */
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #334155;
+  --color-text-muted: #64748b;
+  --color-text-disabled: #94a3b8;
+  --color-text-inverse: #f8fafc;
+  
+  /* Brand/Accent colors */
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-primary-light: #3b82f6;
+  --color-primary-foreground: #ffffff;
+  
+  --color-secondary: #64748b;
+  --color-secondary-hover: #475569;
+  --color-secondary-foreground: #ffffff;
+  
+  /* Semantic colors */
+  --color-success: #16a34a;
+  --color-success-bg: rgba(22, 163, 74, 0.08);
+  --color-success-border: rgba(22, 163, 74, 0.25);
+  
+  --color-warning: #d97706;
+  --color-warning-bg: rgba(217, 119, 6, 0.08);
+  --color-warning-border: rgba(217, 119, 6, 0.25);
+  
+  --color-danger: #dc2626;
+  --color-danger-bg: rgba(220, 38, 38, 0.08);
+  --color-danger-border: rgba(220, 38, 38, 0.25);
+  
+  --color-info: #2563eb;
+  --color-info-bg: rgba(37, 99, 235, 0.08);
+  --color-info-border: rgba(37, 99, 235, 0.25);
+  
+  /* Input colors */
+  --color-input-bg: #ffffff;
+  --color-input-border: #cbd5e1;
+  --color-input-focus: #3b82f6;
+  --color-input-placeholder: #94a3b8;
+  
+  /* Special backgrounds */
+  --gradient-bg: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f8fafc 100%);
+  --gradient-card: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+  --gradient-accent: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  
+  /* Board specific */
+  --color-board-bg: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+  --color-cell: #ffffff;
+  --color-cell-border: #94a3b8;
+  --color-cell-safe: #e2e8f0;
+  --color-cell-safe-border: #16a34a;
+  
+  /* Shadows for light theme */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.06);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.06);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.06);
+  --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.15);
+}
+

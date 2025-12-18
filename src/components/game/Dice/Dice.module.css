@@ -1,0 +1,55 @@
+/* ==========================================================================
+   DICE COMPONENT STYLES
+   ========================================================================== */
+
+.dice {
+  transition: transform var(--transition-normal);
+}
+
+.diceAnimating {
+  animation: bounce 1s infinite;
+}
+
+/* --------------------------------------------------------------------------
+   DICE PAIR
+   -------------------------------------------------------------------------- */
+
+.dicePair {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.doubleIndicator {
+  padding: 0.25rem 0.5rem;
+  background: rgba(245, 158, 11, 0.2);
+  border: 1px solid rgba(245, 158, 11, 0.5);
+  border-radius: var(--radius-sm);
+  color: var(--color-warning);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* --------------------------------------------------------------------------
+   ANIMATIONS
+   -------------------------------------------------------------------------- */
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+

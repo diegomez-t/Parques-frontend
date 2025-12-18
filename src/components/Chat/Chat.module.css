@@ -1,0 +1,117 @@
+/* ==========================================================================
+   CHAT COMPONENT STYLES
+   ========================================================================== */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 20rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-md);
+}
+
+/* --------------------------------------------------------------------------
+   MESSAGES AREA
+   -------------------------------------------------------------------------- */
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+  padding-right: var(--space-xs);
+}
+
+.emptyState {
+  text-align: center;
+  color: var(--color-text-disabled);
+  font-size: var(--font-size-sm);
+  padding: var(--space-md);
+}
+
+/* --------------------------------------------------------------------------
+   MESSAGE ITEM
+   -------------------------------------------------------------------------- */
+
+.message {
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+}
+
+.messageSystem {
+  composes: message;
+  color: var(--color-text-muted);
+  font-style: italic;
+  text-align: center;
+}
+
+.messageAuthor {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary);
+}
+
+.messageContent {
+  color: var(--color-text-secondary);
+}
+
+/* --------------------------------------------------------------------------
+   INPUT FORM
+   -------------------------------------------------------------------------- */
+
+.form {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-input-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-md);
+  font-family: inherit;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-input-focus);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.input::placeholder {
+  color: var(--color-input-placeholder);
+}
+
+.sendButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1rem;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  font-family: inherit;
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  background: var(--color-primary);
+  color: var(--color-primary-foreground);
+  transition: all var(--transition-normal);
+}
+
+.sendButton:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.sendButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+

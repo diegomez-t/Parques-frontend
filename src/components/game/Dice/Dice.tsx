@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { cn } from "@/lib/utils";
+import styles from "./Dice.module.css";
 
 interface DiceProps {
   value?: number;
@@ -10,7 +10,7 @@ interface DiceProps {
   onRollComplete?: (value: number) => void;
 }
 
-// Positions des points pour chaque face du dé
+// Dot positions for each dice face
 const DOT_POSITIONS: Record<number, Array<{ x: number; y: number }>> = {
   1: [{ x: 50, y: 50 }],
   2: [
@@ -45,27 +45,32 @@ const DOT_POSITIONS: Record<number, Array<{ x: number; y: number }>> = {
   ],
 };
 
-export function Dice({ value = 1, isRolling = false, size = 60, onRollComplete }: DiceProps) {
+export function Dice({
+  value = 1,
+  isRolling = false,
+  size = 60,
+  onRollComplete,
+}: DiceProps) {
   const [displayValue, setDisplayValue] = useState(value);
   const [animating, setAnimating] = useState(false);
-  
+
   useEffect(() => {
     if (isRolling) {
       setAnimating(true);
-      
-      // Animation de roulement
+
+      // Rolling animation
       const interval = setInterval(() => {
         setDisplayValue(Math.floor(Math.random() * 6) + 1);
       }, 80);
-      
-      // Arrêter après 800ms et montrer la vraie valeur
+
+      // Stop after 800ms and show the real value
       const timeout = setTimeout(() => {
         clearInterval(interval);
         setDisplayValue(value);
         setAnimating(false);
         onRollComplete?.(value);
       }, 800);
-      
+
       return () => {
         clearInterval(interval);
         clearTimeout(timeout);
@@ -79,16 +84,13 @@ export function Dice({ value = 1, isRolling = false, size = 60, onRollComplete }
   const dotRadius = size * 0.1;
 
   return (
-    <svg 
-      width={size} 
-      height={size} 
+    <svg
+      width={size}
+      height={size}
       viewBox="0 0 100 100"
-      className={cn(
-        "transition-transform",
-        animating && "animate-bounce"
-      )}
+      className={`${styles.dice} ${animating ? styles.diceAnimating : ""}`}
     >
-      {/* Ombre */}
+      {/* Shadow */}
       <rect
         x={8}
         y={8}
@@ -97,8 +99,8 @@ export function Dice({ value = 1, isRolling = false, size = 60, onRollComplete }
         rx={12}
         fill="rgba(0,0,0,0.3)"
       />
-      
-      {/* Fond du dé */}
+
+      {/* Dice background */}
       <rect
         x={4}
         y={4}
@@ -109,8 +111,8 @@ export function Dice({ value = 1, isRolling = false, size = 60, onRollComplete }
         stroke="#e0e0e0"
         strokeWidth={2}
       />
-      
-      {/* Dégradé pour effet 3D */}
+
+      {/* Gradient for 3D effect */}
       <defs>
         <linearGradient id="diceGradient" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#ffffff" />
@@ -125,8 +127,8 @@ export function Dice({ value = 1, isRolling = false, size = 60, onRollComplete }
         rx={12}
         fill="url(#diceGradient)"
       />
-      
-      {/* Points du dé */}
+
+      {/* Dice dots */}
       {dots.map((dot, index) => (
         <circle
           key={index}
@@ -147,9 +149,14 @@ interface DicePairProps {
   onRollComplete?: (values: [number, number]) => void;
 }
 
-export function DicePair({ values = [1, 1], isRolling = false, size = 60, onRollComplete }: DicePairProps) {
+export function DicePair({
+  values = [1, 1],
+  isRolling = false,
+  size = 60,
+  onRollComplete,
+}: DicePairProps) {
   const [completedCount, setCompletedCount] = useState(0);
-  
+
   useEffect(() => {
     if (isRolling) {
       setCompletedCount(0);
@@ -157,7 +164,7 @@ export function DicePair({ values = [1, 1], isRolling = false, size = 60, onRoll
   }, [isRolling]);
 
   const handleDiceComplete = () => {
-    setCompletedCount(prev => {
+    setCompletedCount((prev) => {
       const newCount = prev + 1;
       if (newCount >= 2) {
         onRollComplete?.(values);
@@ -169,27 +176,24 @@ export function DicePair({ values = [1, 1], isRolling = false, size = 60, onRoll
   const isDouble = values[0] === values[1];
 
   return (
-    <div className="flex items-center gap-3">
-      <Dice 
-        value={values[0]} 
-        isRolling={isRolling} 
+    <div className={styles.dicePair}>
+      <Dice
+        value={values[0]}
+        isRolling={isRolling}
         size={size}
         onRollComplete={handleDiceComplete}
       />
-      <Dice 
-        value={values[1]} 
-        isRolling={isRolling} 
+      <Dice
+        value={values[1]}
+        isRolling={isRolling}
         size={size}
         onRollComplete={handleDiceComplete}
       />
-      
-      {/* Indicateur de double */}
+
+      {/* Double indicator */}
       {isDouble && !isRolling && (
-        <div className="px-2 py-1 bg-yellow-500/20 border border-yellow-500/50 rounded text-yellow-400 text-xs font-bold animate-pulse">
-          ¡DOBLE!
-        </div>
+        <div className={styles.doubleIndicator}>¡DOBLE!</div>
       )}
     </div>
   );
 }
-
