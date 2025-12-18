@@ -8,7 +8,8 @@
     "save": "Guardar",
     "delete": "Eliminar",
     "edit": "Editar",
-    "back": "Volver"
+    "back": "Volver",
+    "players": "Jugadores"
   },
   "home": {
     "title": "Parqués Colombiano",
@@ -41,14 +42,41 @@
     "waiting": "Esperando jugadores...",
     "ready": "Listo",
     "notReady": "No listo",
+    "connected": "Conectado",
+    "disconnected": "Desconectado",
     "start": "Iniciar Partida",
     "leave": "Salir",
     "rollDice": "Lanzar Dados",
+    "rolling": "Lanzando...",
     "pass": "Pasar",
+    "endTurn": "terminar turno",
     "yourTurn": "¡Tu turno!",
     "waitingTurn": "Esperando turno...",
     "winner": "¡Ganador!",
-    "gameOver": "Fin del Juego"
+    "gameOver": "Fin del Juego",
+    "exitPrison": "Salir de la Cárcel",
+    "pawnSelected": "Ficha {number} seleccionada",
+    "selectPawn": "Selecciona una ficha para mover",
+    "chooseMove": "Elige cómo mover:",
+    "pawn": "Ficha",
+    "diceSum": "Suma",
+    "dice1": "Dado 1",
+    "dice2": "Dado 2",
+    "toCell": "casilla",
+    "toFinish": "Llegada",
+    "toHeaven": "¡CIELO!",
+    "sumHint": "Si no usas la suma, podrás mover otra ficha con el dado restante",
+    "needDoubleToExit": "Necesitas un doble para salir. ¡Lanza de nuevo!",
+    "doubleCanExit": "¡Doble! Puedes salir de la cárcel.",
+    "clickPawnToSelect": "Haz clic en una ficha o usa los botones para seleccionar.",
+    "consecutiveDoubles": "Dobles consecutivos",
+    "oneMoreDoubleHeaven": "¡Un doble más y tu ficha va al Cielo!",
+    "double": "¡Doble! Tienes otro turno.",
+    "remainingDie": "Dado restante",
+    "selectAnotherPawn": "Selecciona otra ficha para usar este dado",
+    "turn": "Turno",
+    "phase": "Fase",
+    "diceUsed": "Dados usados"
   },
   "chat": {
     "placeholder": "Escribe un mensaje...",
@@ -60,5 +88,10 @@
     "gameStarted": "La partida ya comenzó",
     "invalidCode": "Código inválido",
     "connectionError": "Error de conexión"
+  },
+  "notFound": {
+    "title": "Página no encontrada",
+    "description": "La página que buscas no existe.",
+    "backHome": "Volver al inicio"
   }
 }

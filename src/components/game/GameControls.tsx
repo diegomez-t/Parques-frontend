@@ -108,23 +108,23 @@ export function GameControls({
       // Create dice label
       let diceLabel: string;
       if (move.diceUsed === "sum") {
-        diceLabel = `🎲 Suma: ${diceValues[0]} + ${diceValues[1]} = ${sum}`;
+        diceLabel = `🎲 ${t("diceSum")}: ${diceValues[0]} + ${diceValues[1]} = ${sum}`;
       } else if (move.diceUsed === "dice1") {
-        diceLabel = `🎲 Dado 1: ${diceValues[0]}`;
+        diceLabel = `🎲 ${t("dice1")}: ${diceValues[0]}`;
       } else {
-        diceLabel = `🎲 Dado 2: ${diceValues[1]}`;
+        diceLabel = `🎲 ${t("dice2")}: ${diceValues[1]}`;
       }
 
       // Format target position
       let posLabel: string;
       if (move.targetPosition >= 100) {
         if (move.targetPosition >= 107) {
-          posLabel = "→ ¡CIELO!";
+          posLabel = `→ ${t("toHeaven")}`;
         } else {
-          posLabel = `→ Llegada ${move.targetPosition - 100 + 1}`;
+          posLabel = `→ ${t("toFinish")} ${move.targetPosition - 100 + 1}`;
         }
       } else {
-        posLabel = `→ casilla ${move.targetPosition}`;
+        posLabel = `→ ${t("toCell")} ${move.targetPosition}`;
       }
 
       options.push({
@@ -144,7 +144,7 @@ export function GameControls({
     });
 
     return options;
-  }, [selectedPawnId, movesForSelectedPawn, diceValues, sum]);
+  }, [selectedPawnId, movesForSelectedPawn, diceValues, sum, t]);
 
   // Update highlighted cells when pawn is selected
   useEffect(() => {
@@ -256,7 +256,7 @@ export function GameControls({
             </p>
             {isDouble && (
               <p className={styles.diceDoubleMessage}>
-                ¡Doble! Tienes otro turno.
+                {t("double")}
               </p>
             )}
 
@@ -264,13 +264,13 @@ export function GameControls({
             {usedDice.length > 0 && usedDice.length < 2 && !isDouble && (
               <div className={styles.remainingDiceBox}>
                 <p className={styles.remainingDiceText}>
-                  🎲 Dado restante:{" "}
+                  🎲 {t("remainingDie")}:{" "}
                   <span className={styles.remainingDiceValue}>
                     {remainingDice.join(", ")}
                   </span>
                 </p>
                 <p className={styles.remainingDiceHint}>
-                  Selecciona otra ficha para usar este dado
+                  {t("selectAnotherPawn")}
                 </p>
               </div>
             )}
@@ -283,8 +283,8 @@ export function GameControls({
         <div className={styles.pawnSelection}>
           <p className={styles.pawnSelectionLabel}>
             {selectedPawnId !== null
-              ? `Ficha ${selectedPawnId + 1} seleccionada`
-              : "Selecciona una ficha para mover"}
+              ? t("pawnSelected", { number: selectedPawnId + 1 })
+              : t("selectPawn")}
           </p>
 
           {/* Quick pawn selection buttons */}
@@ -309,7 +309,7 @@ export function GameControls({
                   disabled={!hasValidMoves}
                   className={buttonClass}
                 >
-                  Ficha {pawn.id + 1}
+                  {t("pawn")} {pawn.id + 1}
                 </button>
               );
             })}
@@ -320,7 +320,7 @@ export function GameControls({
       {/* Move options */}
       {selectedPawnId !== null && moveOptions.length > 0 && (
         <div className={styles.moveOptions}>
-          <p className={styles.moveOptionsLabel}>Elige cómo mover:</p>
+          <p className={styles.moveOptionsLabel}>{t("chooseMove")}</p>
           <div className={styles.moveOptionsList}>
             {moveOptions.map((option, i) => (
               <button
@@ -342,8 +342,7 @@ export function GameControls({
 
           {moveOptions.length > 1 && (
             <p className={styles.moveOptionsHint}>
-              💡 Si no usas la suma, podrás mover otra ficha con el dado
-              restante
+              💡 {t("sumHint")}
             </p>
           )}
         </div>
@@ -357,7 +356,7 @@ export function GameControls({
             disabled={!isMyTurn || isRolling}
             className={styles.btnPrimary}
           >
-            {isRolling ? "🎲 Lanzando..." : `🎲 ${t("rollDice")}`}
+            {isRolling ? `🎲 ${t("rolling")}` : `🎲 ${t("rollDice")}`}
           </button>
         )}
 
@@ -367,7 +366,7 @@ export function GameControls({
             disabled={!isMyTurn}
             className={styles.btnPrimary}
           >
-            🚪 Salir de la Cárcel
+            🚪 {t("exitPrison")}
           </button>
         )}
 
@@ -377,7 +376,7 @@ export function GameControls({
             disabled={!isMyTurn}
             className={styles.btnSecondary}
           >
-            {usedDice.length > 0 ? `${t("pass")} (terminar turno)` : t("pass")}
+            {usedDice.length > 0 ? `${t("pass")} (${t("endTurn")})` : t("pass")}
           </button>
         )}
       </div>
@@ -387,17 +386,17 @@ export function GameControls({
         <div className={styles.helpMessages}>
           {allInPrison && !isDouble && hasRolled && (
             <p className={styles.helpWarning}>
-              ⚠️ Necesitas un doble para salir. ¡Lanza de nuevo!
+              ⚠️ {t("needDoubleToExit")}
             </p>
           )}
           {allInPrison && isDouble && (
             <p className={styles.helpSuccess}>
-              ✅ ¡Doble! Puedes salir de la cárcel.
+              ✅ {t("doubleCanExit")}
             </p>
           )}
           {canMove && selectedPawnId === null && pawnsOnBoard.length > 0 && (
             <p className={styles.helpInfo}>
-              👆 Haz clic en una ficha o usa los botones para seleccionar.
+              👆 {t("clickPawnToSelect")}
             </p>
           )}
         </div>
@@ -407,11 +406,11 @@ export function GameControls({
       {consecutiveDoubles > 0 && (
         <div className={styles.doublesCounter}>
           <span className={styles.doublesText}>
-            Dobles consecutivos: {consecutiveDoubles}/3
+            {t("consecutiveDoubles")}: {consecutiveDoubles}/3
           </span>
           {consecutiveDoubles === 2 && (
             <p className={styles.doublesWarning}>
-              ⚠️ ¡Un doble más y tu ficha va al Cielo!
+              ⚠️ {t("oneMoreDoubleHeaven")}
             </p>
           )}
         </div>
@@ -419,11 +418,11 @@ export function GameControls({
 
       {/* Stats */}
       <div className={styles.stats}>
-        <p className={styles.statLine}>Turno: {gameState?.turnNumber || 0}</p>
-        <p className={styles.statLine}>Fase: {parquesPhase}</p>
+        <p className={styles.statLine}>{t("turn")}: {gameState?.turnNumber || 0}</p>
+        <p className={styles.statLine}>{t("phase")}: {parquesPhase}</p>
         {usedDice.length > 0 && (
           <p className={styles.statLine}>
-            Dados usados: {usedDice.map((d) => d + 1).join(", ")}
+            {t("diceUsed")}: {usedDice.map((d) => d + 1).join(", ")}
           </p>
         )}
       </div>

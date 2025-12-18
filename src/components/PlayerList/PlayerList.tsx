@@ -17,11 +17,12 @@ const AVATAR_STYLES: Record<string, string> = {
 
 export function PlayerList() {
   const t = useTranslations("game");
+  const tCommon = useTranslations("common");
   const players = useGameStore((state) => state.players);
 
   return (
     <div className={styles.container}>
-      <h3 className={styles.title}>Jugadores ({players.length})</h3>
+      <h3 className={styles.title}>{tCommon("players")} ({players.length})</h3>
       <div className={styles.list}>
         {players.length === 0 ? (
           <p className={styles.emptyState}>{t("waiting")}</p>
@@ -54,8 +55,8 @@ export function PlayerList() {
                       }`}
                     >
                       {player.connectionStatus === "connected"
-                        ? "Conectado"
-                        : "Desconectado"}
+                        ? t("connected")
+                        : t("disconnected")}
                     </span>
                   </div>
                 </div>

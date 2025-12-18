@@ -8,7 +8,8 @@
     "save": "Enregistrer",
     "delete": "Supprimer",
     "edit": "Modifier",
-    "back": "Retour"
+    "back": "Retour",
+    "players": "Joueurs"
   },
   "home": {
     "title": "Parqués Colombien",
@@ -41,14 +42,41 @@
     "waiting": "En attente de joueurs...",
     "ready": "Prêt",
     "notReady": "Pas prêt",
+    "connected": "Connecté",
+    "disconnected": "Déconnecté",
     "start": "Démarrer la partie",
     "leave": "Quitter",
     "rollDice": "Lancer les dés",
+    "rolling": "Lancement...",
     "pass": "Passer",
+    "endTurn": "finir le tour",
     "yourTurn": "Votre tour !",
     "waitingTurn": "En attente du tour...",
     "winner": "Gagnant !",
-    "gameOver": "Fin de partie"
+    "gameOver": "Fin de partie",
+    "exitPrison": "Sortir de prison",
+    "pawnSelected": "Pion {number} sélectionné",
+    "selectPawn": "Sélectionnez un pion à déplacer",
+    "chooseMove": "Choisissez comment déplacer :",
+    "pawn": "Pion",
+    "diceSum": "Somme",
+    "dice1": "Dé 1",
+    "dice2": "Dé 2",
+    "toCell": "case",
+    "toFinish": "Arrivée",
+    "toHeaven": "PARADIS !",
+    "sumHint": "Si vous n'utilisez pas la somme, vous pouvez déplacer un autre pion avec le dé restant",
+    "needDoubleToExit": "Vous avez besoin d'un double pour sortir. Relancez !",
+    "doubleCanExit": "Double ! Vous pouvez sortir de prison.",
+    "clickPawnToSelect": "Cliquez sur un pion ou utilisez les boutons pour sélectionner.",
+    "consecutiveDoubles": "Doubles consécutifs",
+    "oneMoreDoubleHeaven": "Un double de plus et votre pion va au Paradis !",
+    "double": "Double ! Vous rejouez.",
+    "remainingDie": "Dé restant",
+    "selectAnotherPawn": "Sélectionnez un autre pion pour utiliser ce dé",
+    "turn": "Tour",
+    "phase": "Phase",
+    "diceUsed": "Dés utilisés"
   },
   "chat": {
     "placeholder": "Tapez un message...",
@@ -60,5 +88,10 @@
     "gameStarted": "Partie déjà commencée",
     "invalidCode": "Code invalide",
     "connectionError": "Erreur de connexion"
+  },
+  "notFound": {
+    "title": "Page introuvable",
+    "description": "La page que vous recherchez n'existe pas.",
+    "backHome": "Retour à l'accueil"
   }
 }

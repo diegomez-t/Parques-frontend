@@ -218,7 +218,7 @@ export default function CreateRoomPage() {
     <Suspense
       fallback={
         <main className={styles.mainCentered}>
-          <div className={styles.loadingWrapper}>Cargando...</div>
+          <div className={styles.loadingWrapper}>🎲</div>
         </main>
       }
     >

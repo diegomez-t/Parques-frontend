@@ -8,7 +8,8 @@
     "save": "Save",
     "delete": "Delete",
     "edit": "Edit",
-    "back": "Back"
+    "back": "Back",
+    "players": "Players"
   },
   "home": {
     "title": "Colombian Parqués",
@@ -41,14 +42,41 @@
     "waiting": "Waiting for players...",
     "ready": "Ready",
     "notReady": "Not ready",
+    "connected": "Connected",
+    "disconnected": "Disconnected",
     "start": "Start Game",
     "leave": "Leave",
     "rollDice": "Roll Dice",
+    "rolling": "Rolling...",
     "pass": "Pass",
+    "endTurn": "end turn",
     "yourTurn": "Your turn!",
     "waitingTurn": "Waiting for turn...",
     "winner": "Winner!",
-    "gameOver": "Game Over"
+    "gameOver": "Game Over",
+    "exitPrison": "Exit Prison",
+    "pawnSelected": "Pawn {number} selected",
+    "selectPawn": "Select a pawn to move",
+    "chooseMove": "Choose how to move:",
+    "pawn": "Pawn",
+    "diceSum": "Sum",
+    "dice1": "Dice 1",
+    "dice2": "Dice 2",
+    "toCell": "to cell",
+    "toFinish": "Finish",
+    "toHeaven": "HEAVEN!",
+    "sumHint": "If you don't use the sum, you can move another pawn with the remaining die",
+    "needDoubleToExit": "You need a double to exit. Roll again!",
+    "doubleCanExit": "Double! You can exit prison.",
+    "clickPawnToSelect": "Click on a pawn or use the buttons to select.",
+    "consecutiveDoubles": "Consecutive doubles",
+    "oneMoreDoubleHeaven": "One more double and your pawn goes to Heaven!",
+    "double": "Double! You get another turn.",
+    "remainingDie": "Remaining die",
+    "selectAnotherPawn": "Select another pawn to use this die",
+    "turn": "Turn",
+    "phase": "Phase",
+    "diceUsed": "Dice used"
   },
   "chat": {
     "placeholder": "Type a message...",
@@ -60,5 +88,10 @@
     "gameStarted": "Game already started",
     "invalidCode": "Invalid code",
     "connectionError": "Connection error"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "The page you are looking for does not exist.",
+    "backHome": "Back to home"
   }
 }
