@@ -8,8 +8,8 @@ import styles from "./Board.module.css";
 const BOARD_CONFIG = {
   TOTAL_CELLS: 68,
   LLEGADA_CELLS: 7,
-  SEGUROS: [1, 8, 13, 18, 25, 30, 35, 42, 47, 52, 59, 64],
-  SALIDAS: [1, 18, 35, 52],
+  SEGUROS: [5, 12, 17, 22, 29, 34, 39, 46, 51, 56, 63, 68],
+  SALIDAS: [5, 22, 39, 56],
 };
 
 const PLAYER_COLORS = {
