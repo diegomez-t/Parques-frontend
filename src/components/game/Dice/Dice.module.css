@@ -1,13 +1,16 @@
 /* ==========================================================================
-   DICE COMPONENT STYLES
+   DICE COMPONENT STYLES - PIXEL ART ZELDA STYLE
    ========================================================================== */
 
 .dice {
-  transition: transform var(--transition-normal);
+  transition: transform 100ms ease;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
 }
 
 .diceAnimating {
-  animation: bounce 1s infinite;
+  animation: diceShake 0.1s infinite;
 }
 
 /* --------------------------------------------------------------------------
@@ -18,38 +21,62 @@
   display: flex;
   align-items: center;
   gap: var(--space-md);
+  position: relative;
 }
 
 .doubleIndicator {
-  padding: 0.25rem 0.5rem;
-  background: rgba(245, 158, 11, 0.2);
-  border: 1px solid rgba(245, 158, 11, 0.5);
-  border-radius: var(--radius-sm);
-  color: var(--color-warning);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-bold);
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  position: absolute;
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 12px;
+  background: var(--gold);
+  border: 3px solid var(--gold-dark);
+  box-shadow: var(--shadow-pixel-md);
+  animation: doublePulse 0.5s ease-in-out infinite alternate;
+}
+
+.doubleText {
+  font-family: var(--font-family-pixel);
+  font-size: var(--pixel-font-sm);
+  color: #1A0F0A;
+  letter-spacing: 1px;
+  text-shadow: none;
 }
 
 /* --------------------------------------------------------------------------
-   ANIMATIONS
+   ANIMATIONS - PIXEL ART STYLE
    -------------------------------------------------------------------------- */
 
-@keyframes bounce {
+@keyframes diceShake {
   0%, 100% {
-    transform: translateY(0);
+    transform: translate(0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate(-2px, 2px) rotate(-5deg);
   }
   50% {
-    transform: translateY(-10px);
+    transform: translate(2px, -2px) rotate(5deg);
+  }
+  75% {
+    transform: translate(-2px, -2px) rotate(-5deg);
   }
 }
 
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
+@keyframes doublePulse {
+  0% {
+    transform: translateX(-50%) scale(1);
+    box-shadow: var(--shadow-pixel-md);
   }
-  50% {
-    opacity: 0.5;
+  100% {
+    transform: translateX(-50%) scale(1.05);
+    box-shadow: 
+      var(--shadow-pixel-md),
+      0 0 10px var(--gold);
   }
 }
 
+/* Rolling state shadow glow */
+.diceAnimating {
+  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
+}

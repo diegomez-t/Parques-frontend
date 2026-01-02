@@ -1,15 +1,20 @@
 /* ==========================================================================
-   GAME AREA COMPONENT STYLES
+   GAME AREA COMPONENT STYLES - PIXEL ART ZELDA STYLE
    ========================================================================== */
 
 .container {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--space-md);
+  gap: var(--space-lg);
+  padding: var(--space-md);
+  max-width: 1600px;
+  margin: 0 auto;
 }
 
 .boardSection {
-  /* Full width on mobile */
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
 }
 
 .sidebar {
@@ -22,9 +27,10 @@
    RESPONSIVE
    -------------------------------------------------------------------------- */
 
-@media (min-width: 1280px) {
+@media (min-width: 1024px) {
   .container {
-    grid-template-columns: 3fr 1fr;
+    grid-template-columns: 2fr 1fr;
+    gap: var(--space-xl);
   }
 
   .boardSection {
@@ -32,3 +38,25 @@
   }
 }
 
+@media (min-width: 1280px) {
+  .container {
+    grid-template-columns: 3fr 1fr;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   PIXEL ART DECORATIVE ELEMENTS
+   -------------------------------------------------------------------------- */
+
+/* Add decorative borders around sections */
+.boardSection::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border: 2px dashed var(--wood-border);
+  pointer-events: none;
+  opacity: 0.3;
+}

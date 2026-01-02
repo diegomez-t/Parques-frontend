@@ -1,31 +1,49 @@
 /* ==========================================================================
-   PLAYER LIST COMPONENT STYLES
+   PLAYER LIST COMPONENT STYLES - PIXEL ART ZELDA STYLE
    ========================================================================== */
 
 .container {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  background: var(--wood-dark);
+  border: 4px solid var(--wood-border);
   padding: var(--space-lg);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-pixel-lg);
+  position: relative;
+}
+
+/* Inner decorative border */
+.container::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  bottom: 8px;
+  border: 2px solid var(--wood-light);
+  pointer-events: none;
 }
 
 .title {
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-primary);
+  font-family: var(--font-family-pixel);
+  font-size: var(--pixel-font-md);
+  color: var(--gold);
   margin-bottom: var(--space-md);
+  text-shadow: var(--shadow-pixel-sm);
+  letter-spacing: 1px;
+  text-align: center;
 }
 
 .list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: var(--space-sm);
 }
 
 .emptyState {
-  color: var(--color-text-muted);
+  color: var(--wood-highlight);
+  font-family: var(--font-family);
   font-size: var(--font-size-sm);
+  text-align: center;
+  padding: var(--space-md);
 }
 
 /* --------------------------------------------------------------------------
@@ -36,14 +54,15 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-md);
-  background: var(--color-surface-muted);
-  border-radius: var(--radius-md);
-  transition: background-color var(--transition-fast);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--wood-medium);
+  border: 3px solid var(--wood-border);
+  transition: all 100ms ease;
 }
 
 .playerItem:hover {
-  background: var(--color-surface-hover);
+  background: var(--wood-light);
+  transform: translateX(2px);
 }
 
 .playerInfo {
@@ -53,28 +72,48 @@
 }
 
 /* --------------------------------------------------------------------------
-   AVATAR
+   AVATAR - Pixel art style square avatars
    -------------------------------------------------------------------------- */
 
 .avatar {
-  width: 2rem;
-  height: 2rem;
-  border-radius: var(--radius-full);
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-weight: var(--font-weight-bold);
-  font-size: var(--font-size-sm);
+  font-family: var(--font-family-pixel);
+  font-size: var(--pixel-font-sm);
+  border: 3px solid;
+  box-shadow: var(--shadow-pixel-sm);
 }
 
 /* Player color variants */
-.avatarRed { background-color: var(--game-red); }
-.avatarBlue { background-color: var(--game-blue); }
-.avatarGreen { background-color: var(--game-green); }
-.avatarYellow { background-color: var(--game-yellow); color: #1a1a2e; }
-.avatarPurple { background-color: var(--game-purple); }
-.avatarOrange { background-color: var(--game-orange); }
+.avatarRed { 
+  background: linear-gradient(180deg, var(--game-red-light) 0%, var(--game-red) 100%);
+  border-color: var(--game-red-dark);
+}
+.avatarBlue { 
+  background: linear-gradient(180deg, var(--game-blue-light) 0%, var(--game-blue) 100%);
+  border-color: var(--game-blue-dark);
+}
+.avatarGreen { 
+  background: linear-gradient(180deg, var(--game-green-light) 0%, var(--game-green) 100%);
+  border-color: var(--game-green-dark);
+}
+.avatarYellow { 
+  background: linear-gradient(180deg, var(--game-yellow-light) 0%, var(--game-yellow) 100%);
+  border-color: var(--game-yellow-dark);
+  color: var(--wood-dark);
+}
+.avatarPurple { 
+  background: linear-gradient(180deg, var(--game-purple-light) 0%, var(--game-purple) 100%);
+  border-color: var(--game-purple-dark);
+}
+.avatarOrange { 
+  background: linear-gradient(180deg, var(--game-orange-light) 0%, var(--game-orange) 100%);
+  border-color: var(--game-orange-dark);
+}
 
 /* --------------------------------------------------------------------------
    PLAYER DETAILS
@@ -83,7 +122,7 @@
 .playerDetails {
   display: flex;
   flex-direction: column;
-  gap: var(--space-xs);
+  gap: 2px;
 }
 
 .playerNameRow {
@@ -93,28 +132,34 @@
 }
 
 .playerName {
+  font-family: var(--font-family);
   font-weight: var(--font-weight-medium);
-  color: var(--color-text-primary);
+  color: var(--wood-highlight);
+  font-size: var(--font-size-sm);
 }
 
 .hostBadge {
-  font-size: var(--font-size-xs);
-  padding: 0.125rem 0.5rem;
-  background: rgba(245, 158, 11, 0.2);
-  color: var(--color-warning);
-  border-radius: var(--radius-sm);
+  font-family: var(--font-family-pixel);
+  font-size: 7px;
+  padding: 2px 6px;
+  background: var(--gold);
+  color: var(--wood-dark);
+  border: 2px solid var(--gold-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .connectionStatus {
+  font-family: var(--font-family);
   font-size: var(--font-size-xs);
 }
 
 .statusConnected {
-  color: var(--color-success);
+  color: #00FF00;
 }
 
 .statusDisconnected {
-  color: var(--color-danger);
+  color: #FF0000;
 }
 
 /* --------------------------------------------------------------------------
@@ -122,21 +167,24 @@
    -------------------------------------------------------------------------- */
 
 .readyStatus {
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
-  padding: 0.25rem 0.75rem;
-  border-radius: var(--radius-full);
+  font-family: var(--font-family-pixel);
+  font-size: 7px;
+  padding: 4px 8px;
+  border: 2px solid;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .readyStatusReady {
   composes: readyStatus;
-  background: var(--color-success-bg);
-  color: var(--color-success);
+  background: rgba(0, 255, 0, 0.2);
+  border-color: #00FF00;
+  color: #00FF00;
 }
 
 .readyStatusNotReady {
   composes: readyStatus;
-  background: var(--color-surface-active);
-  color: var(--color-text-muted);
+  background: var(--wood-medium);
+  border-color: var(--wood-border);
+  color: var(--wood-highlight);
 }
-

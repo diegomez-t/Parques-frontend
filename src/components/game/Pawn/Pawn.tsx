@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import styles from "./Pawn.module.css";
 
 interface PawnProps {
@@ -8,29 +9,36 @@ interface PawnProps {
   isSelected?: boolean;
   isMovable?: boolean;
   onClick?: () => void;
+  direction?: "f" | "b" | "l" | "r"; // front, back, left, right
 }
 
-const COLOR_MAP: Record<
-  string,
-  { fill: string; stroke: string; highlight: string }
-> = {
-  red: { fill: "#e53935", stroke: "#ab000d", highlight: "#ff6f60" },
-  blue: { fill: "#1e88e5", stroke: "#005cb2", highlight: "#6ab7ff" },
-  green: { fill: "#43a047", stroke: "#00701a", highlight: "#76d275" },
-  yellow: { fill: "#fdd835", stroke: "#c6a700", highlight: "#ffff6b" },
-  purple: { fill: "#8e24aa", stroke: "#5c007a", highlight: "#c158dc" },
-  orange: { fill: "#fb8c00", stroke: "#c25e00", highlight: "#ffbd45" },
+// Map player colors to pawn animals
+const PAWN_ANIMALS: Record<string, string> = {
+  red: "jaguar",
+  blue: "dolphine",
+  green: "frog",
+  yellow: "perrot",
+};
+
+// Prefix for each animal
+const ANIMAL_PREFIX: Record<string, string> = {
+  jaguar: "j",
+  dolphine: "d",
+  frog: "f",
+  perrot: "p",
 };
 
 export function Pawn({
   color,
-  size = 20,
+  size = 32,
   isSelected = false,
   isMovable = false,
   onClick,
+  direction = "f",
 }: PawnProps) {
-  const colors = COLOR_MAP[color] || COLOR_MAP.blue;
-  const halfSize = size / 2;
+  const animal = PAWN_ANIMALS[color] || "jaguar";
+  const prefix = ANIMAL_PREFIX[animal];
+  const imagePath = `/Pawns/${animal}/${prefix}${direction}.webp`;
 
   const classNames = [
     styles.pawn,
@@ -42,73 +50,115 @@ export function Pawn({
 
   return (
     <g onClick={onClick} className={classNames}>
-      {/* Shadow */}
-      <ellipse
-        cx={0}
-        cy={halfSize * 0.3}
-        rx={halfSize * 0.7}
-        ry={halfSize * 0.2}
-        fill="rgba(0,0,0,0.3)"
-      />
-
-      {/* Pawn body (bowling pin shape) */}
-      <ellipse
-        cx={0}
-        cy={0}
-        rx={halfSize * 0.8}
-        ry={halfSize * 0.5}
-        fill={colors.fill}
-        stroke={colors.stroke}
-        strokeWidth={size * 0.05}
-      />
-
-      {/* Pawn head */}
-      <circle
-        cx={0}
-        cy={-halfSize * 0.4}
-        r={halfSize * 0.4}
-        fill={colors.fill}
-        stroke={colors.stroke}
-        strokeWidth={size * 0.05}
-      />
-
-      {/* Highlight */}
-      <ellipse
-        cx={-halfSize * 0.15}
-        cy={-halfSize * 0.5}
-        rx={halfSize * 0.1}
-        ry={halfSize * 0.15}
-        fill={colors.highlight}
-        opacity={0.6}
-      />
-
-      {/* Selection indicator */}
+      {/* Selection indicator - pixel art style ring */}
       {isSelected && (
-        <circle
-          cx={0}
-          cy={0}
-          r={halfSize * 1.2}
+        <rect
+          x={-size / 2 - 4}
+          y={-size / 2 - 4}
+          width={size + 8}
+          height={size + 8}
           fill="none"
-          stroke="#fff"
-          strokeWidth={2}
-          strokeDasharray="4 2"
+          stroke="#FFD700"
+          strokeWidth={3}
           className={styles.selectionRing}
         />
       )}
 
       {/* Movable indicator */}
       {isMovable && !isSelected && (
-        <circle
-          cx={0}
-          cy={0}
-          r={halfSize * 1.1}
+        <rect
+          x={-size / 2 - 2}
+          y={-size / 2 - 2}
+          width={size + 4}
+          height={size + 4}
           fill="none"
-          stroke="rgba(255,255,255,0.5)"
-          strokeWidth={1}
-          strokeDasharray="2 2"
+          stroke="rgba(255,255,255,0.6)"
+          strokeWidth={2}
+          strokeDasharray="4 4"
           className={styles.movableRing}
         />
       )}
+
+      {/* Shadow - pixel art style */}
+      <ellipse
+        cx={0}
+        cy={size / 2 - 2}
+        rx={size / 3}
+        ry={size / 8}
+        fill="rgba(0,0,0,0.4)"
+        className={styles.shadow}
+      />
+
+      {/* Pawn sprite image using foreignObject */}
+      <foreignObject
+        x={-size / 2}
+        y={-size / 2}
+        width={size}
+        height={size}
+        className={styles.spriteContainer}
+      >
+        <div
+          style={{
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Image
+            src={imagePath}
+            alt={`${color} pawn`}
+            width={size}
+            height={size}
+            className={styles.sprite}
+            style={{
+              imageRendering: "pixelated",
+              objectFit: "contain",
+            }}
+            unoptimized
+          />
+        </div>
+      </foreignObject>
     </g>
+  );
+}
+
+// Alternative component for HTML context (outside SVG)
+export function PawnImage({
+  color,
+  size = 48,
+  isSelected = false,
+  isMovable = false,
+  onClick,
+  direction = "f",
+}: PawnProps) {
+  const animal = PAWN_ANIMALS[color] || "jaguar";
+  const prefix = ANIMAL_PREFIX[animal];
+  const imagePath = `/Pawns/${animal}/${prefix}${direction}.webp`;
+
+  const classNames = [
+    styles.pawnImage,
+    isMovable && styles.pawnMovable,
+    isSelected && styles.pawnImageSelected,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  return (
+    <div className={classNames} onClick={onClick} style={{ width: size, height: size }}>
+      <Image
+        src={imagePath}
+        alt={`${color} pawn`}
+        width={size}
+        height={size}
+        className={styles.sprite}
+        style={{
+          imageRendering: "pixelated",
+          objectFit: "contain",
+        }}
+        unoptimized
+      />
+    </div>
   );
 }

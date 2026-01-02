@@ -1,20 +1,47 @@
 /* ==========================================================================
-   BOARD COMPONENT STYLES
+   BOARD COMPONENT STYLES - PIXEL ART ZELDA STYLE
    ========================================================================== */
 
 .container {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  background: linear-gradient(145deg, #2C1810 0%, #1A0F0A 100%);
+  border: 6px solid #654321;
+  border-radius: 8px;
   padding: var(--space-md);
-  box-shadow: var(--shadow-lg);
+  box-shadow: 
+    0 0 0 4px #3D2512,
+    0 8px 32px rgba(0, 0, 0, 0.6),
+    inset 0 2px 4px rgba(255, 255, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Pixel art scanline effect overlay */
+.container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.03) 2px,
+    rgba(0, 0, 0, 0.03) 4px
+  );
+  pointer-events: none;
+  z-index: 10;
 }
 
 .svg {
   width: 100%;
-  max-width: 600px;
+  max-width: 680px;
   margin: 0 auto;
   display: block;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
 }
 
 /* --------------------------------------------------------------------------
@@ -26,7 +53,7 @@
 }
 
 .cell {
-  transition: all var(--transition-fast);
+  transition: all 100ms ease;
 }
 
 .cell:hover {
@@ -34,43 +61,61 @@
 }
 
 .cellHighlighted {
-  animation: pulse 1s ease-in-out infinite;
+  animation: cellPulse 0.6s ease-in-out infinite alternate;
+}
+
+.cellIcon {
+  pointer-events: none;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
 }
 
 /* --------------------------------------------------------------------------
-   PRISON STYLES
+   CORNER ZONE (PRISON) STYLES
    -------------------------------------------------------------------------- */
 
-.prisonRect {
-  opacity: 0.8;
+.cornerZone {
+  transition: all 200ms ease;
 }
 
-.prisonCanExit {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+.cornerCanExit {
+  animation: exitPulse 1s ease-in-out infinite;
+  filter: drop-shadow(0 0 8px #4ADE80);
 }
 
-.prisonText {
-  font-weight: bold;
+.cornerLabel {
+  font-family: 'Press Start 2P', monospace;
+  letter-spacing: 1px;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
 }
 
 .prisonPawn {
   cursor: pointer;
+  transition: transform 100ms ease;
+}
+
+.prisonPawn:hover {
+  transform: scale(1.1);
 }
 
 /* --------------------------------------------------------------------------
-   LLEGADA STYLES
+   LLEGADA (ARRIVAL PATH) STYLES
    -------------------------------------------------------------------------- */
 
 .llegadaCell {
-  transition: opacity var(--transition-fast);
+  transition: all 150ms ease;
 }
 
 .llegadaCellFinal {
-  /* Special styling for final cell */
+  filter: drop-shadow(0 0 4px #FFD700);
 }
 
 .llegadaPawn {
   cursor: pointer;
+  transition: transform 100ms ease;
+}
+
+.llegadaPawn:hover {
+  transform: scale(1.1);
 }
 
 /* --------------------------------------------------------------------------
@@ -78,20 +123,72 @@
    -------------------------------------------------------------------------- */
 
 .legend {
-  font-size: 10px;
-  fill: var(--color-text-muted);
+  font-family: 'Press Start 2P', monospace;
+  letter-spacing: 0.5px;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.8);
 }
 
 /* --------------------------------------------------------------------------
-   ANIMATIONS
+   ANIMATIONS - PIXEL ART STYLE
    -------------------------------------------------------------------------- */
 
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
+@keyframes cellPulse {
+  0% {
+    opacity: 0.8;
+    transform: scale(1);
   }
-  50% {
-    opacity: 0.6;
+  100% {
+    opacity: 1;
+    transform: scale(1.05);
   }
 }
 
+@keyframes exitPulse {
+  0%, 100% {
+    opacity: 0.9;
+    stroke-width: 4;
+  }
+  50% {
+    opacity: 1;
+    stroke-width: 6;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   RESPONSIVE
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 640px) {
+  .container {
+    padding: var(--space-sm);
+    border-width: 4px;
+  }
+  
+  .svg {
+    max-width: 100%;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   RETRO CRT EFFECT (optional, for extra retro feel)
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  .container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      radial-gradient(
+        ellipse at center,
+        transparent 0%,
+        rgba(0, 0, 0, 0.1) 80%,
+        rgba(0, 0, 0, 0.3) 100%
+      );
+    pointer-events: none;
+    z-index: 11;
+  }
+}

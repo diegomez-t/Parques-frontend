@@ -1,9 +1,10 @@
 /* ==========================================================================
-   PAWN COMPONENT STYLES
+   PAWN COMPONENT STYLES - PIXEL ART ZELDA STYLE
    ========================================================================== */
 
 .pawn {
-  transition: transform var(--transition-normal);
+  transition: transform 150ms ease;
+  cursor: default;
 }
 
 .pawnMovable {
@@ -11,23 +12,77 @@
 }
 
 .pawnMovable:hover {
-  transform: scale(1.1);
+  transform: scale(1.15);
 }
 
 .pawnSelected {
-  animation: bounce 1s infinite;
+  animation: bounce 0.6s ease-in-out infinite;
 }
 
 /* --------------------------------------------------------------------------
-   SELECTION INDICATOR
+   SPRITE STYLES
+   -------------------------------------------------------------------------- */
+
+.spriteContainer {
+  overflow: visible;
+  pointer-events: none;
+}
+
+.sprite {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  pointer-events: none;
+}
+
+.shadow {
+  filter: blur(2px);
+}
+
+/* --------------------------------------------------------------------------
+   SELECTION INDICATORS - PIXEL ART STYLE
    -------------------------------------------------------------------------- */
 
 .selectionRing {
-  animation: spin 3s linear infinite;
+  animation: selectPulse 0.5s ease-in-out infinite alternate;
+  filter: drop-shadow(0 0 4px #FFD700);
 }
 
 .movableRing {
-  /* Subtle indicator for movable pawns */
+  animation: movablePulse 1s ease-in-out infinite;
+}
+
+/* --------------------------------------------------------------------------
+   HTML PAWN IMAGE (for outside SVG context)
+   -------------------------------------------------------------------------- */
+
+.pawnImage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 150ms ease;
+}
+
+.pawnImage.pawnMovable {
+  cursor: pointer;
+}
+
+.pawnImage.pawnMovable:hover {
+  transform: scale(1.15);
+}
+
+.pawnImageSelected {
+  animation: bounce 0.6s ease-in-out infinite;
+}
+
+.pawnImageSelected::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border: 3px solid #FFD700;
+  animation: selectPulse 0.5s ease-in-out infinite alternate;
+  box-shadow: 0 0 8px #FFD700;
 }
 
 /* --------------------------------------------------------------------------
@@ -39,16 +94,26 @@
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-3px);
+    transform: translateY(-6px);
   }
 }
 
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
+@keyframes selectPulse {
+  0% {
+    opacity: 0.7;
+    stroke-width: 2;
   }
-  to {
-    transform: rotate(360deg);
+  100% {
+    opacity: 1;
+    stroke-width: 4;
   }
 }
 
+@keyframes movablePulse {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}

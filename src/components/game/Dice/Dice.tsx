@@ -10,38 +10,38 @@ interface DiceProps {
   onRollComplete?: (value: number) => void;
 }
 
-// Dot positions for each dice face
+// Dot positions for each dice face - pixel art style
 const DOT_POSITIONS: Record<number, Array<{ x: number; y: number }>> = {
   1: [{ x: 50, y: 50 }],
   2: [
-    { x: 25, y: 25 },
-    { x: 75, y: 75 },
+    { x: 28, y: 28 },
+    { x: 72, y: 72 },
   ],
   3: [
-    { x: 25, y: 25 },
+    { x: 28, y: 28 },
     { x: 50, y: 50 },
-    { x: 75, y: 75 },
+    { x: 72, y: 72 },
   ],
   4: [
-    { x: 25, y: 25 },
-    { x: 75, y: 25 },
-    { x: 25, y: 75 },
-    { x: 75, y: 75 },
+    { x: 28, y: 28 },
+    { x: 72, y: 28 },
+    { x: 28, y: 72 },
+    { x: 72, y: 72 },
   ],
   5: [
-    { x: 25, y: 25 },
-    { x: 75, y: 25 },
+    { x: 28, y: 28 },
+    { x: 72, y: 28 },
     { x: 50, y: 50 },
-    { x: 25, y: 75 },
-    { x: 75, y: 75 },
+    { x: 28, y: 72 },
+    { x: 72, y: 72 },
   ],
   6: [
-    { x: 25, y: 25 },
-    { x: 75, y: 25 },
-    { x: 25, y: 50 },
-    { x: 75, y: 50 },
-    { x: 25, y: 75 },
-    { x: 75, y: 75 },
+    { x: 28, y: 28 },
+    { x: 72, y: 28 },
+    { x: 28, y: 50 },
+    { x: 72, y: 50 },
+    { x: 28, y: 72 },
+    { x: 72, y: 72 },
   ],
 };
 
@@ -58,18 +58,18 @@ export function Dice({
     if (isRolling) {
       setAnimating(true);
 
-      // Rolling animation
+      // Rolling animation - faster for pixel art feel
       const interval = setInterval(() => {
         setDisplayValue(Math.floor(Math.random() * 6) + 1);
-      }, 80);
+      }, 60);
 
-      // Stop after 800ms and show the real value
+      // Stop after 600ms and show the real value
       const timeout = setTimeout(() => {
         clearInterval(interval);
         setDisplayValue(value);
         setAnimating(false);
         onRollComplete?.(value);
-      }, 800);
+      }, 600);
 
       return () => {
         clearInterval(interval);
@@ -81,7 +81,6 @@ export function Dice({
   }, [isRolling, value, onRollComplete]);
 
   const dots = DOT_POSITIONS[displayValue] || DOT_POSITIONS[1];
-  const dotRadius = size * 0.1;
 
   return (
     <svg
@@ -89,53 +88,52 @@ export function Dice({
       height={size}
       viewBox="0 0 100 100"
       className={`${styles.dice} ${animating ? styles.diceAnimating : ""}`}
+      style={{ imageRendering: "pixelated" }}
     >
-      {/* Shadow */}
+      {/* Pixel art shadow */}
       <rect
-        x={8}
-        y={8}
-        width={84}
-        height={84}
-        rx={12}
-        fill="rgba(0,0,0,0.3)"
+        x={6}
+        y={6}
+        width={88}
+        height={88}
+        fill="#1A0F0A"
       />
 
-      {/* Dice background */}
+      {/* Dice main body - pixel art style (no rounded corners) */}
       <rect
-        x={4}
-        y={4}
-        width={84}
-        height={84}
-        rx={12}
-        fill="#f5f5f5"
-        stroke="#e0e0e0"
+        x={0}
+        y={0}
+        width={88}
+        height={88}
+        fill="#F5DEB3"
+        stroke="#654321"
+        strokeWidth={4}
+      />
+      
+      {/* Inner border for depth */}
+      <rect
+        x={6}
+        y={6}
+        width={76}
+        height={76}
+        fill="none"
+        stroke="#DEB887"
         strokeWidth={2}
       />
 
-      {/* Gradient for 3D effect */}
-      <defs>
-        <linearGradient id="diceGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#ffffff" />
-          <stop offset="100%" stopColor="#e8e8e8" />
-        </linearGradient>
-      </defs>
-      <rect
-        x={4}
-        y={4}
-        width={84}
-        height={84}
-        rx={12}
-        fill="url(#diceGradient)"
-      />
+      {/* Highlight edge */}
+      <line x1={4} y1={4} x2={84} y2={4} stroke="#FFF8DC" strokeWidth={2} />
+      <line x1={4} y1={4} x2={4} y2={84} stroke="#FFF8DC" strokeWidth={2} />
 
-      {/* Dice dots */}
+      {/* Dice dots - pixel art squares */}
       {dots.map((dot, index) => (
-        <circle
+        <rect
           key={index}
-          cx={dot.x * 0.84 + 8}
-          cy={dot.y * 0.84 + 8}
-          r={dotRadius}
-          fill="#1a202c"
+          x={dot.x * 0.88 - 6}
+          y={dot.y * 0.88 - 6}
+          width={12}
+          height={12}
+          fill="#2C1810"
         />
       ))}
     </svg>
@@ -190,9 +188,11 @@ export function DicePair({
         onRollComplete={handleDiceComplete}
       />
 
-      {/* Double indicator */}
+      {/* Double indicator - pixel art style */}
       {isDouble && !isRolling && (
-        <div className={styles.doubleIndicator}>¡DOBLE!</div>
+        <div className={styles.doubleIndicator}>
+          <span className={styles.doubleText}>¡DOBLE!</span>
+        </div>
       )}
     </div>
   );
