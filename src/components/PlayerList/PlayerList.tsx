@@ -4,15 +4,13 @@ import { useTranslations } from "next-intl";
 import { useGameStore } from "@/store/gameStore";
 import styles from "./PlayerList.module.css";
 
-const PLAYER_COLORS = ["red", "blue", "green", "yellow", "purple", "orange"] as const;
+const PLAYER_COLORS = ["red", "blue", "green", "yellow"] as const;
 
 const AVATAR_STYLES: Record<string, string> = {
   red: styles.avatarRed,
   blue: styles.avatarBlue,
   green: styles.avatarGreen,
   yellow: styles.avatarYellow,
-  purple: styles.avatarPurple,
-  orange: styles.avatarOrange,
 };
 
 export function PlayerList() {

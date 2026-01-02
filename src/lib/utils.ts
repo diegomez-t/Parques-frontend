@@ -15,6 +15,6 @@ export function getPlayerColorClass(
   index: number,
   prefix: string = "player"
 ): string {
-  const colors = ["red", "blue", "green", "yellow", "purple", "orange"];
+  const colors = ["red", "blue", "green", "yellow"];
   return `${prefix}-${colors[index] || "blue"}`;
 }

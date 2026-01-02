@@ -106,14 +106,6 @@
   border-color: var(--game-yellow-dark);
   color: var(--wood-dark);
 }
-.avatarPurple { 
-  background: linear-gradient(180deg, var(--game-purple-light) 0%, var(--game-purple) 100%);
-  border-color: var(--game-purple-dark);
-}
-.avatarOrange { 
-  background: linear-gradient(180deg, var(--game-orange-light) 0%, var(--game-orange) 100%);
-  border-color: var(--game-orange-dark);
-}
 
 /* --------------------------------------------------------------------------
    PLAYER DETAILS

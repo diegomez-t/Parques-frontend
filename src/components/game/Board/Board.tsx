@@ -5,105 +5,22 @@ import { useGameStore } from "@/store/gameStore";
 import { Pawn } from "../Pawn/Pawn";
 import styles from "./Board.module.css";
 
-// 4-player board configuration
 const BOARD_CONFIG = {
-  CELLS_PER_SIDE: 17,
   TOTAL_CELLS: 68,
-  LLEGADA_CELLS: 8,
-  SEGUROS: [0, 7, 17, 24, 34, 41, 51, 58],
-  SALIDAS: [0, 17, 34, 51],
+  LLEGADA_CELLS: 7,
+  SEGUROS: [5, 12, 22, 29, 39, 46, 56, 63],
+  SALIDAS: [5, 22, 39, 56],
 };
 
-// Player colors - Parques colombiano style
 const PLAYER_COLORS = {
-  0: { 
-    main: "#D32F2F", 
-    light: "#FF6659", 
-    dark: "#9A0007", 
-    name: "red",
-    label: "JAGUAR"
-  },
-  1: { 
-    main: "#1976D2", 
-    light: "#63A4FF", 
-    dark: "#004BA0", 
-    name: "blue",
-    label: "DELFÍN"
-  },
-  2: { 
-    main: "#388E3C", 
-    light: "#6ABF69", 
-    dark: "#00600F", 
-    name: "green",
-    label: "RANA"
-  },
-  3: { 
-    main: "#FBC02D", 
-    light: "#FFF263", 
-    dark: "#C49000", 
-    name: "yellow",
-    label: "LORO"
-  },
+  0: { main: "#D32F2F", light: "#FF6659", dark: "#9A0007", name: "red" },
+  1: { main: "#1976D2", light: "#63A4FF", dark: "#004BA0", name: "blue" },
+  2: { main: "#388E3C", light: "#6ABF69", dark: "#00600F", name: "green" },
+  3: { main: "#FBC02D", light: "#FFF263", dark: "#C49000", name: "yellow" },
 } as const;
 
-// Board dimensions
-const BOARD_SIZE = 680;
-const CELL_SIZE = 28;
-const CORNER_SIZE = 140;
-const PATH_WIDTH = 84; // 3 cells wide
-
-interface CellPosition {
-  x: number;
-  y: number;
-  rotation: number;
-}
-
-// Generate cell positions for the cross-shaped path
-function generateCellPositions(): CellPosition[] {
-  const positions: CellPosition[] = [];
-  const center = BOARD_SIZE / 2;
-  const pathOffset = PATH_WIDTH / 2;
-  
-  // Path goes: Right side (bottom to top) → Top (right to left) → Left side (top to bottom) → Bottom (left to right)
-  
-  // RIGHT ARM: cells 0-16 (bottom to top on right side)
-  for (let i = 0; i <= 16; i++) {
-    positions.push({
-      x: BOARD_SIZE - CORNER_SIZE - CELL_SIZE / 2,
-      y: center + pathOffset - CELL_SIZE / 2 - i * CELL_SIZE + 8 * CELL_SIZE,
-      rotation: 0,
-    });
-  }
-  
-  // TOP ARM: cells 17-33 (right to left on top)
-  for (let i = 0; i <= 16; i++) {
-    positions.push({
-      x: center + pathOffset - CELL_SIZE / 2 - i * CELL_SIZE + 8 * CELL_SIZE,
-      y: CORNER_SIZE + CELL_SIZE / 2,
-      rotation: 90,
-    });
-  }
-  
-  // LEFT ARM: cells 34-50 (top to bottom on left side)
-  for (let i = 0; i <= 16; i++) {
-    positions.push({
-      x: CORNER_SIZE + CELL_SIZE / 2,
-      y: center - pathOffset + CELL_SIZE / 2 + i * CELL_SIZE - 8 * CELL_SIZE,
-      rotation: 180,
-    });
-  }
-  
-  // BOTTOM ARM: cells 51-67 (left to right on bottom)
-  for (let i = 0; i <= 16; i++) {
-    positions.push({
-      x: center - pathOffset + CELL_SIZE / 2 + i * CELL_SIZE - 8 * CELL_SIZE,
-      y: BOARD_SIZE - CORNER_SIZE - CELL_SIZE / 2,
-      rotation: 270,
-    });
-  }
-
-  return positions;
-}
+const SIZE = 600;
+const CELL = 40; // Cell size
 
 interface PawnData {
   id: number;
@@ -122,317 +39,213 @@ interface BoardProps {
   onCellClick: (cellIndex: number) => void;
 }
 
-interface BoardCellProps {
-  index: number;
-  position: CellPosition;
-  isSeguro: boolean;
-  isSalida: boolean;
-  playerSalida?: number;
-  pawnsOnCell: Array<{
-    playerId: string;
-    pawnId: number;
-    color: string;
-    isSelected: boolean;
-    isMovable: boolean;
-  }>;
-  isHighlighted: boolean;
-  onCellClick: (index: number) => void;
-  onPawnClick: (playerId: string, pawnId: number) => void;
+// Grid helper: 15x15 grid, each cell is CELL pixels
+// Corners occupy grid cells 0-5 (columns/rows)
+// Arms occupy grid cells 6-8 (center 3 cells)
+// The path runs along the EDGES of the arms
+function G(col: number, row: number) {
+  return { x: col * CELL + CELL / 2, y: row * CELL + CELL / 2 };
 }
 
-function BoardCell({
-  index,
-  position,
-  isSeguro,
-  isSalida,
-  playerSalida,
-  pawnsOnCell,
-  isHighlighted,
-  onCellClick,
-  onPawnClick,
-}: BoardCellProps) {
-  const playerColor =
-    playerSalida !== undefined
-      ? PLAYER_COLORS[playerSalida as keyof typeof PLAYER_COLORS]
-      : null;
+// Generate exactly 68 cells forming a continuous path around the cross
+// Path goes CLOCKWISE starting from red's area
+function getPathCells(): Array<{ x: number; y: number; salida?: number }> {
+  const cells: Array<{ x: number; y: number; salida?: number }> = [];
 
-  const getCellFill = () => {
-    if (isHighlighted) return "#4ADE80";
-    if (playerColor) return playerColor.light;
-    if (isSeguro) return "#8B5A2B";
-    return "#DEB887";
-  };
+  // The cross on a 15x15 grid:
+  // - Corners: 0-5 and 9-14 (6 cells each)
+  // - Arms: 6-8 (3 cells wide)
+  // - Path runs along perimeter of the cross shape
 
-  const getCellStroke = () => {
-    if (isHighlighted) return "#22C55E";
-    if (playerColor) return playerColor.dark;
-    if (isSeguro) return "#654321";
-    return "#8B4513";
-  };
+  // === SECTION 1: RIGHT ARM (Red's territory) ===
+  // Bottom edge of right arm, going right (cells 0-4)
+  cells.push(G(9, 8));   // 0
+  cells.push(G(10, 8));  // 1
+  cells.push(G(11, 8));  // 2
+  cells.push(G(12, 8));  // 3
+  cells.push(G(13, 8));  // 4
+  // Red Salida at corner (cell 5)
+  cells.push({ ...G(14, 7), salida: 0 }); // 5
+  // Top edge of right arm, going left (cells 6-10)
+  cells.push(G(13, 6));  // 6
+  cells.push(G(12, 6));  // 7
+  cells.push(G(11, 6));  // 8
+  cells.push(G(10, 6));  // 9
+  cells.push(G(9, 6));   // 10
 
-  return (
-    <g
-      transform={`translate(${position.x}, ${position.y})`}
-      onClick={() => onCellClick(index)}
-      className={styles.cellGroup}
-    >
-      {/* Pixel art style cell - square with pixelated border */}
-      <rect
-        x={-CELL_SIZE / 2}
-        y={-CELL_SIZE / 2}
-        width={CELL_SIZE}
-        height={CELL_SIZE}
-        fill={getCellFill()}
-        stroke={getCellStroke()}
-        strokeWidth={isHighlighted ? 3 : 2}
-        className={`${styles.cell} ${isHighlighted ? styles.cellHighlighted : ""}`}
-      />
+  // === SECTION 2: TOP ARM (Green's territory) ===
+  // Right edge of top arm, going up (cells 11-16)
+  cells.push(G(8, 5));   // 11
+  cells.push(G(8, 4));   // 12 - seguro
+  cells.push(G(8, 3));   // 13
+  cells.push(G(8, 2));   // 14
+  cells.push(G(8, 1));   // 15
+  cells.push(G(8, 0));   // 16
+  // Top corner transition (cell 17)
+  cells.push(G(7, 0));   // 17 - seguro
+  // Left edge of top arm going down (cells 18-21)
+  cells.push(G(6, 0));   // 18
+  cells.push(G(6, 1));   // 19
+  cells.push(G(6, 2));   // 20
+  cells.push(G(6, 3));   // 21
+  // Green Salida (cell 22)
+  cells.push({ ...G(6, 4), salida: 2 }); // 22
+  // Continue down (cell 23)
+  cells.push(G(6, 5));   // 23
 
-      {/* Seguro star - pixel art style */}
-      {isSeguro && !isSalida && (
-        <text 
-          x={0} 
-          y={5} 
-          textAnchor="middle" 
-          fontSize={14} 
-          fill="#FFD700"
-          className={styles.cellIcon}
-          style={{ fontFamily: "'Press Start 2P', monospace" }}
-        >
-          ★
-        </text>
-      )}
+  // === SECTION 3: LEFT ARM (Yellow's territory) ===
+  // Top edge of left arm, going left (cells 24-28)
+  cells.push(G(5, 6));   // 24
+  cells.push(G(4, 6));   // 25
+  cells.push(G(3, 6));   // 26
+  cells.push(G(2, 6));   // 27
+  cells.push(G(1, 6));   // 28
+  // Left corner (cell 29) - seguro
+  cells.push(G(0, 6));   // 29 - seguro
+  // Left edge going down (cells 30-33)
+  cells.push(G(0, 7));   // 30
+  cells.push(G(0, 8));   // 31
+  cells.push(G(1, 8));   // 32
+  cells.push(G(2, 8));   // 33
+  // Bottom edge of left arm, going right (cells 34-38)
+  cells.push(G(3, 8));   // 34 - seguro
+  cells.push(G(4, 8));   // 35
+  cells.push(G(5, 8));   // 36
 
-      {/* Salida marker */}
-      {isSalida && (
-        <text
-          x={0}
-          y={6}
-          textAnchor="middle"
-          fontSize={10}
-          fill={playerColor?.dark || "#654321"}
-          fontWeight="bold"
-          className={styles.cellIcon}
-        >
-          S
-        </text>
-      )}
+  // === SECTION 4: BOTTOM ARM (Blue's territory) ===
+  // Left edge of bottom arm, going down (cells 37-38)
+  cells.push(G(6, 9));   // 37
+  cells.push(G(6, 10));  // 38
+  // Yellow Salida (cell 39)
+  cells.push({ ...G(6, 11), salida: 3 }); // 39
+  // Continue down (cells 40-42)
+  cells.push(G(6, 12));  // 40
+  cells.push(G(6, 13));  // 41
+  cells.push(G(6, 14));  // 42
+  // Bottom corner transition (cells 43-45)
+  cells.push(G(7, 14));  // 43
+  cells.push(G(8, 14));  // 44
+  cells.push(G(8, 13));  // 45
+  // Right edge of bottom arm, going up (cells 46-50)
+  cells.push(G(8, 12));  // 46 - seguro
+  cells.push(G(8, 11));  // 47
+  cells.push(G(8, 10));  // 48
+  cells.push(G(8, 9));   // 49
 
-      {/* Pawns on this cell */}
-      {pawnsOnCell.map((pawn, i) => (
-        <g
-          key={`${pawn.playerId}-${pawn.pawnId}`}
-          transform={`translate(${(i % 2) * 14 - 7}, ${Math.floor(i / 2) * 14 - 7})`}
-          onClick={(e) => {
-            e.stopPropagation();
-            onPawnClick(pawn.playerId, pawn.pawnId);
-          }}
-        >
-          <Pawn
-            color={pawn.color}
-            size={22}
-            isSelected={pawn.isSelected}
-            isMovable={pawn.isMovable}
-          />
-        </g>
-      ))}
-    </g>
-  );
+  // === SECTION 5: Complete the loop back to start ===
+  // Bottom edge going right, connecting back (cells 50-55)
+  cells.push(G(9, 8));   // 50 - note: same as cell 0, this is the wraparound point
+  // Instead, continue on different row to avoid overlap
+  // Let me recalculate...
+
+  // Actually for Parques, cell 50 continues on inner track
+  // The path should be:
+  // After cell 49 (8, 9), continue right on row 9
+  cells.push(G(9, 9));   // 50
+  cells.push(G(10, 9));  // 51
+  cells.push(G(11, 9));  // 52
+  cells.push(G(12, 9));  // 53
+  cells.push(G(13, 9));  // 54
+  cells.push(G(14, 9));  // 55
+  // Blue Salida (cell 56)
+  cells.push({ ...G(14, 8), salida: 1 }); // 56
+  // Inner path going back (cells 57-62)
+  cells.push(G(13, 8));  // 57 - note: overlaps with cell 4
+  cells.push(G(12, 8));  // 58
+  cells.push(G(11, 8));  // 59
+  cells.push(G(10, 8));  // 60
+  cells.push(G(9, 8));   // 61
+  cells.push(G(9, 7));   // 62
+
+  // Final cells (63-67)
+  cells.push(G(9, 6));   // 63 - seguro (overlaps with 10)
+  cells.push(G(10, 6));  // 64
+  cells.push(G(11, 6));  // 65
+  cells.push(G(12, 6));  // 66
+  cells.push(G(13, 6));  // 67
+
+  return cells.slice(0, 68);
 }
 
-interface CornerZoneProps {
-  playerIndex: number;
-  pawns: PawnData[];
-  playerId: string;
-  isMyZone: boolean;
-  selectedPawnId: number | null;
-  onPawnClick: (pawnId: number) => void;
-  canExit?: boolean;
-}
-
-function CornerZone({
-  playerIndex,
-  pawns,
-  isMyZone,
-  selectedPawnId,
-  onPawnClick,
-  canExit,
-}: CornerZoneProps) {
-  const color = PLAYER_COLORS[playerIndex as keyof typeof PLAYER_COLORS];
-  
-  // Corner positions (clockwise from bottom-right: red, blue, green, yellow)
-  const cornerPositions = [
-    { x: BOARD_SIZE - CORNER_SIZE / 2, y: BOARD_SIZE - CORNER_SIZE / 2 }, // Red - bottom right
-    { x: BOARD_SIZE - CORNER_SIZE / 2, y: CORNER_SIZE / 2 }, // Blue - top right
-    { x: CORNER_SIZE / 2, y: CORNER_SIZE / 2 }, // Green - top left
-    { x: CORNER_SIZE / 2, y: BOARD_SIZE - CORNER_SIZE / 2 }, // Yellow - bottom left
-  ];
-  
-  const pos = cornerPositions[playerIndex];
-  const pawnsInPrison = pawns.filter((p) => p.inPrison);
-  
-  // Pawn positions within the corner (2x2 grid)
-  const pawnSlots = [
-    { x: -30, y: -30 },
-    { x: 30, y: -30 },
-    { x: -30, y: 30 },
-    { x: 30, y: 30 },
-  ];
-
-  return (
-    <g transform={`translate(${pos.x}, ${pos.y})`}>
-      {/* Corner background - pixel art style */}
-      <rect
-        x={-CORNER_SIZE / 2 + 10}
-        y={-CORNER_SIZE / 2 + 10}
-        width={CORNER_SIZE - 20}
-        height={CORNER_SIZE - 20}
-        rx={0}
-        fill={color.main}
-        stroke={color.dark}
-        strokeWidth={4}
-        className={`${styles.cornerZone} ${canExit ? styles.cornerCanExit : ""}`}
-      />
-      
-      {/* Inner decorative border */}
-      <rect
-        x={-CORNER_SIZE / 2 + 18}
-        y={-CORNER_SIZE / 2 + 18}
-        width={CORNER_SIZE - 36}
-        height={CORNER_SIZE - 36}
-        fill="none"
-        stroke={color.light}
-        strokeWidth={2}
-      />
-
-      {/* Corner label */}
-      <text
-        x={0}
-        y={-CORNER_SIZE / 2 + 36}
-        textAnchor="middle"
-        fontSize={8}
-        fill={color.dark}
-        fontWeight="bold"
-        className={styles.cornerLabel}
-      >
-        {canExit ? "¡SALIR!" : color.label}
-      </text>
-
-      {/* Pawn slots - show empty circles for available spots */}
-      {pawnSlots.map((slot, i) => {
-        const pawnHere = pawnsInPrison[i];
-        return (
-          <g key={i} transform={`translate(${slot.x}, ${slot.y})`}>
-            {/* Slot background */}
-            <circle
-              cx={0}
-              cy={0}
-              r={24}
-              fill={color.dark}
-              stroke={color.light}
-              strokeWidth={2}
-              opacity={0.6}
-            />
-            
-            {pawnHere && (
-              <g
-                onClick={() => isMyZone && onPawnClick(pawnHere.id)}
-                className={isMyZone ? styles.prisonPawn : undefined}
-              >
-                <Pawn
-                  color={color.name}
-                  size={36}
-                  isSelected={selectedPawnId === pawnHere.id}
-                  isMovable={isMyZone || canExit}
-                />
-              </g>
-            )}
-          </g>
-        );
-      })}
-    </g>
-  );
-}
-
-interface LlegadaPathProps {
-  playerIndex: number;
-  pawns: PawnData[];
-  selectedPawnId: number | null;
-  isMyLlegada: boolean;
-  onPawnClick: (pawnId: number) => void;
-}
-
-function LlegadaPath({
-  playerIndex,
-  pawns,
-  selectedPawnId,
-  isMyLlegada,
-  onPawnClick,
-}: LlegadaPathProps) {
-  const color = PLAYER_COLORS[playerIndex as keyof typeof PLAYER_COLORS];
-  const center = BOARD_SIZE / 2;
-
-  // Direction vectors for each player's llegada path
-  const directions = [
-    { dx: -1, dy: 0 },  // Red: from right to center
-    { dx: 0, dy: 1 },   // Blue: from top to center
-    { dx: 1, dy: 0 },   // Green: from left to center
-    { dx: 0, dy: -1 },  // Yellow: from bottom to center
-  ];
-
-  const dir = directions[playerIndex];
-  const startOffset = 160;
-  const cellSpacing = 22;
-  const pawnsInLlegada = pawns.filter((p) => p.inLlegada);
+function BoardBackground() {
+  const cornerSize = 6 * CELL;
+  const armWidth = 3 * CELL;
 
   return (
     <g>
-      {Array.from({ length: BOARD_CONFIG.LLEGADA_CELLS }).map((_, i) => {
-        const x = center + dir.dx * (startOffset - i * cellSpacing);
-        const y = center + dir.dy * (startOffset - i * cellSpacing);
-        const isLast = i === BOARD_CONFIG.LLEGADA_CELLS - 1;
-        const pawnHere = pawnsInLlegada.find((p) => p.llegadaPosition === i);
+      {/* Frame */}
+      <rect x={0} y={0} width={SIZE} height={SIZE} fill="#5D3A1A" stroke="#3D2512" strokeWidth={6} />
+      <rect x={8} y={8} width={SIZE - 16} height={SIZE - 16} fill="#8B5A2B" stroke="#654321" strokeWidth={3} />
+
+      {/* Cross background */}
+      <rect x={cornerSize} y={0} width={armWidth} height={SIZE} fill="#DEB887" stroke="#8B4513" strokeWidth={1} />
+      <rect x={0} y={cornerSize} width={SIZE} height={armWidth} fill="#DEB887" stroke="#8B4513" strokeWidth={1} />
+
+      {/* Corners */}
+      <rect x={10} y={10} width={cornerSize - 10} height={cornerSize - 10} fill={PLAYER_COLORS[2].main} stroke={PLAYER_COLORS[2].dark} strokeWidth={2} />
+      <rect x={SIZE - cornerSize} y={10} width={cornerSize - 10} height={cornerSize - 10} fill={PLAYER_COLORS[0].main} stroke={PLAYER_COLORS[0].dark} strokeWidth={2} />
+      <rect x={10} y={SIZE - cornerSize} width={cornerSize - 10} height={cornerSize - 10} fill={PLAYER_COLORS[3].main} stroke={PLAYER_COLORS[3].dark} strokeWidth={2} />
+      <rect x={SIZE - cornerSize} y={SIZE - cornerSize} width={cornerSize - 10} height={cornerSize - 10} fill={PLAYER_COLORS[1].main} stroke={PLAYER_COLORS[1].dark} strokeWidth={2} />
+
+      {/* Llegada paths (center strip of each arm) */}
+      <rect x={7 * CELL} y={cornerSize} width={CELL} height={cornerSize - CELL} fill={PLAYER_COLORS[2].light} stroke={PLAYER_COLORS[2].dark} strokeWidth={1} />
+      <rect x={cornerSize + CELL} y={7 * CELL} width={cornerSize - CELL} height={CELL} fill={PLAYER_COLORS[0].light} stroke={PLAYER_COLORS[0].dark} strokeWidth={1} />
+      <rect x={7 * CELL} y={cornerSize + armWidth} width={CELL} height={cornerSize - CELL} fill={PLAYER_COLORS[1].light} stroke={PLAYER_COLORS[1].dark} strokeWidth={1} />
+      <rect x={cornerSize} y={7 * CELL} width={cornerSize - CELL} height={CELL} fill={PLAYER_COLORS[3].light} stroke={PLAYER_COLORS[3].dark} strokeWidth={1} />
+
+      {/* Center */}
+      <rect x={cornerSize} y={cornerSize} width={armWidth} height={armWidth} fill="#2C1810" stroke="#FFD700" strokeWidth={2} />
+      <circle cx={SIZE / 2} cy={SIZE / 2} r={CELL * 0.9} fill="#1A0F0A" stroke="#654321" strokeWidth={2} />
+      <text x={SIZE / 2} y={SIZE / 2 - 4} textAnchor="middle" fontSize={14} fill="#FFD700" style={{ fontFamily: "'Press Start 2P'" }}>★</text>
+      <text x={SIZE / 2} y={SIZE / 2 + 12} textAnchor="middle" fontSize={6} fill="#DEB887" style={{ fontFamily: "'Press Start 2P'" }}>CIELO</text>
+    </g>
+  );
+}
+
+function PathCells({
+  pawnsOnCells,
+  highlightedCells,
+  onCellClick,
+  onPawnClick,
+}: {
+  pawnsOnCells: Record<number, Array<{ playerId: string; pawnId: number; color: string; isSelected: boolean; isMovable: boolean }>>;
+  highlightedCells: number[];
+  onCellClick: (index: number) => void;
+  onPawnClick: (playerId: string, pawnId: number) => void;
+}) {
+  const positions = getPathCells();
+
+  return (
+    <g>
+      {positions.map((pos, index) => {
+        const isHighlighted = highlightedCells.includes(index);
+        const isSeguro = BOARD_CONFIG.SEGUROS.includes(index);
+        const isSalida = pos.salida !== undefined;
+        const pawns = pawnsOnCells[index] || [];
+
+        let fill = "#DEB887";
+        let stroke = "#8B4513";
+
+        if (isHighlighted) {
+          fill = "#4ADE80";
+          stroke = "#22C55E";
+        } else if (isSalida && pos.salida !== undefined) {
+          fill = PLAYER_COLORS[pos.salida as keyof typeof PLAYER_COLORS].light;
+          stroke = PLAYER_COLORS[pos.salida as keyof typeof PLAYER_COLORS].dark;
+        } else if (isSeguro) {
+          fill = "#8B5A2B";
+        }
 
         return (
-          <g key={i} transform={`translate(${x}, ${y})`}>
-            {/* Llegada cell - pixel art style */}
-            <rect
-              x={-10}
-              y={-10}
-              width={20}
-              height={20}
-              fill={isLast ? color.main : color.light}
-              stroke={color.dark}
-              strokeWidth={isLast ? 3 : 2}
-              className={`${styles.llegadaCell} ${isLast ? styles.llegadaCellFinal : ""}`}
-            />
-            
-            {isLast && (
-              <text 
-                x={0} 
-                y={4} 
-                textAnchor="middle" 
-                fontSize={10} 
-                fill="#FFD700"
-                style={{ fontFamily: "'Press Start 2P', monospace" }}
-              >
-                ★
-              </text>
-            )}
-            
-            {pawnHere && (
-              <g
-                onClick={() => isMyLlegada && onPawnClick(pawnHere.id)}
-                className={isMyLlegada ? styles.llegadaPawn : undefined}
-              >
-                <Pawn
-                  color={color.name}
-                  size={16}
-                  isSelected={selectedPawnId === pawnHere.id}
-                  isMovable={isMyLlegada}
-                />
+          <g key={index} transform={`translate(${pos.x}, ${pos.y})`} onClick={() => onCellClick(index)} className={styles.cellGroup}>
+            <rect x={-CELL / 2 + 1} y={-CELL / 2 + 1} width={CELL - 2} height={CELL - 2} fill={fill} stroke={stroke} strokeWidth={isHighlighted ? 2 : 1} />
+            {isSeguro && !isSalida && <text x={0} y={3} textAnchor="middle" fontSize={12} fill="#FFD700">★</text>}
+            {isSalida && pos.salida !== undefined && <text x={0} y={4} textAnchor="middle" fontSize={10} fill={PLAYER_COLORS[pos.salida as keyof typeof PLAYER_COLORS].dark} fontWeight="bold">S</text>}
+            {pawns.map((pawn, i) => (
+              <g key={`${pawn.playerId}-${pawn.pawnId}`} transform={`translate(${(i % 2) * 10 - 5}, ${Math.floor(i / 2) * 10 - 5})`} onClick={(e) => { e.stopPropagation(); onPawnClick(pawn.playerId, pawn.pawnId); }}>
+                <Pawn color={pawn.color} size={22} isSelected={pawn.isSelected} isMovable={pawn.isMovable} />
               </g>
-            )}
+            ))}
           </g>
         );
       })}
@@ -440,139 +253,146 @@ function LlegadaPath({
   );
 }
 
-// Center "Cielo" component
-function CieloCenter() {
-  const center = BOARD_SIZE / 2;
-  
-  return (
-    <g transform={`translate(${center}, ${center})`}>
-      {/* Outer decorative ring */}
-      <circle
-        cx={0}
-        cy={0}
-        r={50}
-        fill="#2C1810"
-        stroke="#8B4513"
-        strokeWidth={4}
-      />
-      
-      {/* Inner circle */}
-      <circle
-        cx={0}
-        cy={0}
-        r={40}
-        fill="#1A0F0A"
-        stroke="#654321"
-        strokeWidth={2}
-      />
-      
-      {/* Star decoration */}
-      <text
-        x={0}
-        y={-10}
-        textAnchor="middle"
-        fontSize={16}
-        fill="#FFD700"
-        style={{ fontFamily: "'Press Start 2P', monospace" }}
-      >
-        ★
-      </text>
-      
-      {/* Label */}
-      <text
-        x={0}
-        y={12}
-        textAnchor="middle"
-        fontSize={8}
-        fill="#DEB887"
-        fontWeight="bold"
-        style={{ fontFamily: "'Press Start 2P', monospace", letterSpacing: "1px" }}
-      >
-        CIELO
-      </text>
-    </g>
-  );
-}
-
-// Decorative corner images (Colombian themed)
-function CornerDecoration({ playerIndex }: { playerIndex: number }) {
-  const decorations = [
-    { emoji: "🐆", name: "Jaguar" },
-    { emoji: "🐬", name: "Delfín" },
-    { emoji: "🐸", name: "Rana" },
-    { emoji: "🦜", name: "Loro" },
-  ];
-  
-  const color = PLAYER_COLORS[playerIndex as keyof typeof PLAYER_COLORS];
-  const decoration = decorations[playerIndex];
-  
-  const positions = [
-    { x: BOARD_SIZE - 40, y: BOARD_SIZE - 40 },
-    { x: BOARD_SIZE - 40, y: 40 },
-    { x: 40, y: 40 },
-    { x: 40, y: BOARD_SIZE - 40 },
-  ];
-  
-  const pos = positions[playerIndex];
-  
-  return (
-    <g transform={`translate(${pos.x}, ${pos.y})`}>
-      <text
-        x={0}
-        y={5}
-        textAnchor="middle"
-        fontSize={20}
-        fill={color.main}
-      >
-        {decoration.emoji}
-      </text>
-    </g>
-  );
-}
-
-export function Board({
+function PrisonZones({
+  players,
+  gameData,
+  myPlayer,
   selectedPawnId,
-  onPawnSelect,
-  highlightedCells,
-  onCellClick,
-}: BoardProps) {
+  canSelectPawn,
+  canExitPrison,
+  onPawnClick,
+}: {
+  players: Array<{ id: string; name: string }>;
+  gameData: { pawns?: Record<string, PawnData[]> } | undefined;
+  myPlayer: { id: string } | null;
+  selectedPawnId: number | null;
+  canSelectPawn: boolean;
+  canExitPrison: boolean;
+  onPawnClick: (playerId: string, pawnId: number) => void;
+}) {
+  const cornerSize = 6 * CELL;
+  const cornerConfigs = [
+    { playerIndex: 0, x: SIZE - cornerSize / 2 - 5, y: cornerSize / 2 + 5 },
+    { playerIndex: 1, x: SIZE - cornerSize / 2 - 5, y: SIZE - cornerSize / 2 - 5 },
+    { playerIndex: 2, x: cornerSize / 2 + 5, y: cornerSize / 2 + 5 },
+    { playerIndex: 3, x: cornerSize / 2 + 5, y: SIZE - cornerSize / 2 - 5 },
+  ];
+  const slots = [{ x: -28, y: -28 }, { x: 28, y: -28 }, { x: -28, y: 28 }, { x: 28, y: 28 }];
+
+  return (
+    <g>
+      {players.slice(0, 4).map((player, i) => {
+        const cfg = cornerConfigs[i];
+        if (!cfg) return null;
+        const color = PLAYER_COLORS[cfg.playerIndex as keyof typeof PLAYER_COLORS];
+        const pawns = (gameData?.pawns?.[player.id] || []) as PawnData[];
+        const inPrison = pawns.filter(p => p.inPrison);
+        const isMyZone = player.id === myPlayer?.id;
+        const canInteract = isMyZone && (canSelectPawn || canExitPrison);
+
+        return (
+          <g key={player.id} transform={`translate(${cfg.x}, ${cfg.y})`}>
+            {slots.map((s, j) => {
+              const pawn = inPrison[j];
+              return (
+                <g key={j} transform={`translate(${s.x}, ${s.y})`}>
+                  <circle cx={0} cy={0} r={22} fill={color.dark} stroke={color.light} strokeWidth={2} opacity={0.8} />
+                  {pawn && (
+                    <g onClick={() => canInteract && onPawnClick(player.id, pawn.id)} className={canInteract ? styles.prisonPawn : undefined}>
+                      <Pawn color={color.name} size={32} isSelected={selectedPawnId === pawn.id && isMyZone} isMovable={canInteract} />
+                    </g>
+                  )}
+                </g>
+              );
+            })}
+            <text x={0} y={-50} textAnchor="middle" fontSize={7} fill={color.light} style={{ fontFamily: "'Press Start 2P'" }}>
+              {canExitPrison && isMyZone ? "¡SALIR!" : color.name.toUpperCase()}
+            </text>
+          </g>
+        );
+      })}
+    </g>
+  );
+}
+
+function LlegadaPaths({
+  players,
+  gameData,
+  myPlayer,
+  selectedPawnId,
+  canSelectPawn,
+  onPawnClick,
+}: {
+  players: Array<{ id: string; name: string }>;
+  gameData: { pawns?: Record<string, PawnData[]> } | undefined;
+  myPlayer: { id: string } | null;
+  selectedPawnId: number | null;
+  canSelectPawn: boolean;
+  onPawnClick: (playerId: string, pawnId: number) => void;
+}) {
+  const cornerSize = 6 * CELL;
+  const configs = [
+    { playerIndex: 0, startX: SIZE - cornerSize - CELL / 2, startY: 7 * CELL + CELL / 2, dx: -1, dy: 0 },
+    { playerIndex: 1, startX: 7 * CELL + CELL / 2, startY: SIZE - cornerSize - CELL / 2, dx: 0, dy: -1 },
+    { playerIndex: 2, startX: 7 * CELL + CELL / 2, startY: cornerSize + CELL / 2, dx: 0, dy: 1 },
+    { playerIndex: 3, startX: cornerSize + CELL / 2, startY: 7 * CELL + CELL / 2, dx: 1, dy: 0 },
+  ];
+
+  return (
+    <g>
+      {players.slice(0, 4).map((player, i) => {
+        const cfg = configs[i];
+        if (!cfg) return null;
+        const color = PLAYER_COLORS[cfg.playerIndex as keyof typeof PLAYER_COLORS];
+        const pawns = (gameData?.pawns?.[player.id] || []) as PawnData[];
+        const inLlegada = pawns.filter(p => p.inLlegada);
+        const isMyLlegada = player.id === myPlayer?.id;
+
+        return (
+          <g key={player.id}>
+            {Array.from({ length: BOARD_CONFIG.LLEGADA_CELLS }).map((_, j) => {
+              const x = cfg.startX + cfg.dx * j * CELL;
+              const y = cfg.startY + cfg.dy * j * CELL;
+              const isLast = j === BOARD_CONFIG.LLEGADA_CELLS - 1;
+              const pawn = inLlegada.find(p => p.llegadaPosition === j);
+
+              return (
+                <g key={j} transform={`translate(${x}, ${y})`}>
+                  <rect x={-CELL / 2 + 2} y={-CELL / 2 + 2} width={CELL - 4} height={CELL - 4} fill={isLast ? color.main : color.light} stroke={color.dark} strokeWidth={isLast ? 2 : 1} rx={isLast ? CELL / 2 : 0} />
+                  {isLast && <text x={0} y={3} textAnchor="middle" fontSize={10} fill="#FFD700">★</text>}
+                  {pawn && (
+                    <g onClick={() => isMyLlegada && canSelectPawn && onPawnClick(player.id, pawn.id)}>
+                      <Pawn color={color.name} size={18} isSelected={selectedPawnId === pawn.id && isMyLlegada} isMovable={isMyLlegada && canSelectPawn} />
+                    </g>
+                  )}
+                </g>
+              );
+            })}
+          </g>
+        );
+      })}
+    </g>
+  );
+}
+
+export function Board({ selectedPawnId, onPawnSelect, highlightedCells, onCellClick }: BoardProps) {
   const gameState = useGameStore((state) => state.gameState);
   const players = useGameStore((state) => state.players);
   const myPlayer = useGameStore((state) => state.player);
 
-  const cellPositions = useMemo(() => generateCellPositions(), []);
-
-  const gameData = gameState?.gameData as
-    | {
-        pawns?: Record<string, PawnData[]>;
-        parquesPhase?: string;
-      }
-    | undefined;
-
+  const gameData = gameState?.gameData as { pawns?: Record<string, PawnData[]>; parquesPhase?: string } | undefined;
   const isMyTurn = gameState?.currentPlayerId === myPlayer?.id;
   const parquesPhase = gameData?.parquesPhase || "waiting_roll";
   const canSelectPawn = isMyTurn && parquesPhase === "waiting_move";
   const canExitPrison = isMyTurn && parquesPhase === "waiting_exit";
 
   const pawnsOnCells = useMemo(() => {
-    const cells: Record<
-      number,
-      Array<{
-        playerId: string;
-        pawnId: number;
-        color: string;
-        isSelected: boolean;
-        isMovable: boolean;
-      }>
-    > = {};
-
+    const cells: Record<number, Array<{ playerId: string; pawnId: number; color: string; isSelected: boolean; isMovable: boolean }>> = {};
     if (!gameData?.pawns) return cells;
 
     Object.entries(gameData.pawns).forEach(([playerId, pawns]) => {
       const playerIndex = players.findIndex((p) => p.id === playerId);
-      const color =
-        PLAYER_COLORS[playerIndex as keyof typeof PLAYER_COLORS]?.name ||
-        "blue";
+      const color = PLAYER_COLORS[playerIndex as keyof typeof PLAYER_COLORS]?.name || "blue";
       const isMyPawn = playerId === myPlayer?.id;
 
       pawns.forEach((pawn) => {
@@ -588,7 +408,6 @@ export function Board({
         }
       });
     });
-
     return cells;
   }, [gameData, players, myPlayer, selectedPawnId, canSelectPawn]);
 
@@ -600,155 +419,13 @@ export function Board({
 
   return (
     <div className={styles.container}>
-      <svg
-        viewBox={`0 0 ${BOARD_SIZE} ${BOARD_SIZE}`}
-        className={styles.svg}
-      >
-        {/* Definitions for filters and patterns */}
-        <defs>
-          {/* Pixel art shadow filter */}
-          <filter id="pixelShadow" x="-20%" y="-20%" width="140%" height="140%">
-            <feOffset result="offOut" in="SourceAlpha" dx="2" dy="2" />
-            <feFlood floodColor="#000000" floodOpacity="0.4" result="colorOut"/>
-            <feComposite in="colorOut" in2="offOut" operator="in" result="compOut"/>
-            <feMerge>
-              <feMergeNode in="compOut"/>
-              <feMergeNode in="SourceGraphic"/>
-            </feMerge>
-          </filter>
-          
-          {/* Wood texture pattern */}
-          <pattern id="woodPattern" patternUnits="userSpaceOnUse" width="20" height="20">
-            <rect width="20" height="20" fill="#8B4513"/>
-            <line x1="0" y1="5" x2="20" y2="5" stroke="#654321" strokeWidth="1" opacity="0.3"/>
-            <line x1="0" y1="15" x2="20" y2="15" stroke="#654321" strokeWidth="1" opacity="0.3"/>
-          </pattern>
-        </defs>
-
-        {/* Board background - wood frame */}
-        <rect
-          x={0}
-          y={0}
-          width={BOARD_SIZE}
-          height={BOARD_SIZE}
-          rx={8}
-          fill="#5D3A1A"
-          stroke="#3D2512"
-          strokeWidth={8}
-        />
-        
-        {/* Inner wood frame */}
-        <rect
-          x={12}
-          y={12}
-          width={BOARD_SIZE - 24}
-          height={BOARD_SIZE - 24}
-          rx={4}
-          fill="#8B5A2B"
-          stroke="#654321"
-          strokeWidth={4}
-        />
-
-        {/* Cross-shaped playing area background */}
-        {/* Horizontal bar */}
-        <rect
-          x={CORNER_SIZE}
-          y={BOARD_SIZE / 2 - PATH_WIDTH / 2}
-          width={BOARD_SIZE - 2 * CORNER_SIZE}
-          height={PATH_WIDTH}
-          fill="#DEB887"
-          stroke="#8B4513"
-          strokeWidth={2}
-        />
-        
-        {/* Vertical bar */}
-        <rect
-          x={BOARD_SIZE / 2 - PATH_WIDTH / 2}
-          y={CORNER_SIZE}
-          width={PATH_WIDTH}
-          height={BOARD_SIZE - 2 * CORNER_SIZE}
-          fill="#DEB887"
-          stroke="#8B4513"
-          strokeWidth={2}
-        />
-
-        {/* Center area (Cielo) */}
-        <CieloCenter />
-
-        {/* Corner zones (prisons/starting areas) */}
-        {players.slice(0, 4).map((player, index) => {
-          const pawns = gameData?.pawns?.[player.id] || [];
-          const isMyZone = player.id === myPlayer?.id;
-          return (
-            <CornerZone
-              key={player.id}
-              playerIndex={index}
-              pawns={pawns as PawnData[]}
-              playerId={player.id}
-              isMyZone={isMyZone && (canSelectPawn || canExitPrison)}
-              selectedPawnId={isMyZone ? selectedPawnId : null}
-              onPawnClick={(pawnId) => handlePawnClick(player.id, pawnId)}
-              canExit={isMyZone && canExitPrison}
-            />
-          );
-        })}
-
-        {/* Llegada paths (arrival paths to center) */}
-        {players.slice(0, 4).map((player, index) => {
-          const pawns = gameData?.pawns?.[player.id] || [];
-          return (
-            <LlegadaPath
-              key={player.id}
-              playerIndex={index}
-              pawns={pawns as PawnData[]}
-              selectedPawnId={player.id === myPlayer?.id ? selectedPawnId : null}
-              isMyLlegada={player.id === myPlayer?.id && canSelectPawn}
-              onPawnClick={(pawnId) => handlePawnClick(player.id, pawnId)}
-            />
-          );
-        })}
-
-        {/* Path cells */}
-        {cellPositions.map((pos, index) => {
-          const isSeguro = BOARD_CONFIG.SEGUROS.includes(index);
-          const salidaIndex = BOARD_CONFIG.SALIDAS.indexOf(index);
-          const isSalida = salidaIndex !== -1;
-          const isHighlighted = highlightedCells.includes(index);
-
-          return (
-            <BoardCell
-              key={index}
-              index={index}
-              position={pos}
-              isSeguro={isSeguro}
-              isSalida={isSalida}
-              playerSalida={isSalida ? salidaIndex : undefined}
-              pawnsOnCell={pawnsOnCells[index] || []}
-              isHighlighted={isHighlighted}
-              onCellClick={onCellClick}
-              onPawnClick={handlePawnClick}
-            />
-          );
-        })}
-
-        {/* Corner decorations */}
-        {[0, 1, 2, 3].map((index) => (
-          <CornerDecoration key={index} playerIndex={index} />
-        ))}
-
-        {/* Legend - pixel art style */}
-        <g transform={`translate(${BOARD_SIZE / 2}, ${BOARD_SIZE - 24})`}>
-          <text
-            x={0}
-            y={0}
-            textAnchor="middle"
-            fontSize={8}
-            fill="#DEB887"
-            className={styles.legend}
-            style={{ fontFamily: "'Press Start 2P', monospace" }}
-          >
-            ★ SEGURO • S SALIDA
-          </text>
+      <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className={styles.svg}>
+        <BoardBackground />
+        <PrisonZones players={players} gameData={gameData} myPlayer={myPlayer} selectedPawnId={selectedPawnId} canSelectPawn={canSelectPawn} canExitPrison={canExitPrison} onPawnClick={handlePawnClick} />
+        <LlegadaPaths players={players} gameData={gameData} myPlayer={myPlayer} selectedPawnId={selectedPawnId} canSelectPawn={canSelectPawn} onPawnClick={handlePawnClick} />
+        <PathCells pawnsOnCells={pawnsOnCells} highlightedCells={highlightedCells} onCellClick={onCellClick} onPawnClick={handlePawnClick} />
+        <g transform={`translate(${SIZE / 2}, ${SIZE - 10})`}>
+          <text x={0} y={0} textAnchor="middle" fontSize={6} fill="#DEB887" style={{ fontFamily: "'Press Start 2P'" }}>★ SEGURO • S SALIDA</text>
         </g>
       </svg>
     </div>
