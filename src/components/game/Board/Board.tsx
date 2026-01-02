@@ -19,8 +19,9 @@ const PLAYER_COLORS = {
   3: { main: "#FBC02D", light: "#FFF263", dark: "#C49000", name: "yellow" },
 } as const;
 
-const SIZE = 600;
+const GRID_SIZE = 17; // 17x17 grid
 const CELL = 40; // Cell size
+const SIZE = GRID_SIZE * CELL; // 680px total
 
 interface PawnData {
   id: number;
@@ -39,137 +40,146 @@ interface BoardProps {
   onCellClick: (cellIndex: number) => void;
 }
 
-// Grid helper: 15x15 grid, each cell is CELL pixels
-// Corners occupy grid cells 0-5 (columns/rows)
-// Arms occupy grid cells 6-8 (center 3 cells)
-// The path runs along the EDGES of the arms
+// Grid helper: 17x17 grid, each cell is CELL pixels
+// Corners occupy grid cells 0-6 (7 cells) and 10-16 (7 cells)
+// Arms occupy grid cells 7-9 (center 3 cells)
+// The path runs along the EDGES of the arms (columns 7 and 9, rows 7 and 9)
 function G(col: number, row: number) {
   return { x: col * CELL + CELL / 2, y: row * CELL + CELL / 2 };
 }
 
 // Generate exactly 68 cells forming a continuous path around the cross
-// Path goes CLOCKWISE starting from red's area
-function getPathCells(): Array<{ x: number; y: number; salida?: number }> {
-  const cells: Array<{ x: number; y: number; salida?: number }> = [];
+// Grille 17x17 - 4 coins partagés: 8-9, 25-26, 42-43, 59-60
+// Ces paires partagent visuellement le même coin de la croix
+//
+// SEGUROS: [5, 12, 17, 22, 29, 34, 39, 46, 51, 56, 63, 68]
+// SALIDAS: 5 (Yellow), 22 (Blue), 39 (Red), 56 (Green)
+function getPathCells(): Array<{ x: number; y: number; salida?: number; cellNumber: number }> {
+  const cells: Array<{ x: number; y: number; salida?: number; cellNumber: number }> = [];
+  
+  // Pour les coins partagés, on place les 2 cases côte à côte dans le même espace
+  const addSharedCorner = (col: number, row: number, first: boolean, direction: 'horizontal' | 'vertical', salida?: number) => {
+    const offset = CELL / 4;
+    let x = col * CELL + CELL / 2;
+    let y = row * CELL + CELL / 2;
+    if (direction === 'horizontal') {
+      x += first ? -offset : offset;
+    } else {
+      y += first ? -offset : offset;
+    }
+    cells.push({ x, y, cellNumber: cells.length + 1, salida });
+  };
+  
+  const add = (col: number, row: number, salida?: number) => {
+    cells.push({ ...G(col, row), cellNumber: cells.length + 1, salida });
+  };
 
-  // The cross on a 15x15 grid:
-  // - Corners: 0-5 and 9-14 (6 cells each)
-  // - Arms: 6-8 (3 cells wide)
-  // - Path runs along perimeter of the cross shape
+  // ===== 1-7: Du BAS vers le HAUT (col 9, bras BAS côté droit) =====
+  add(9, 16);     // 1
+  add(9, 15);     // 2
+  add(9, 14);     // 3
+  add(9, 13);     // 4
+  add(9, 12, 3);  // 5 ★ SALIDA Yellow
+  add(9, 11);     // 6
+  add(9, 10);     // 7
 
-  // === SECTION 1: RIGHT ARM (Red's territory) ===
-  // Bottom edge of right arm, going right (cells 0-4)
-  cells.push(G(9, 8));   // 0
-  cells.push(G(10, 8));  // 1
-  cells.push(G(11, 8));  // 2
-  cells.push(G(12, 8));  // 3
-  cells.push(G(13, 8));  // 4
-  // Red Salida at corner (cell 5)
-  cells.push({ ...G(14, 7), salida: 0 }); // 5
-  // Top edge of right arm, going left (cells 6-10)
-  cells.push(G(13, 6));  // 6
-  cells.push(G(12, 6));  // 7
-  cells.push(G(11, 6));  // 8
-  cells.push(G(10, 6));  // 9
-  cells.push(G(9, 6));   // 10
+  // ===== 8-9: COIN partagé (jonction BAS → DROIT) =====
+  addSharedCorner(10, 9, true, 'horizontal');   // 8
+  addSharedCorner(10, 9, false, 'horizontal');  // 9
 
-  // === SECTION 2: TOP ARM (Green's territory) ===
-  // Right edge of top arm, going up (cells 11-16)
-  cells.push(G(8, 5));   // 11
-  cells.push(G(8, 4));   // 12 - seguro
-  cells.push(G(8, 3));   // 13
-  cells.push(G(8, 2));   // 14
-  cells.push(G(8, 1));   // 15
-  cells.push(G(8, 0));   // 16
-  // Top corner transition (cell 17)
-  cells.push(G(7, 0));   // 17 - seguro
-  // Left edge of top arm going down (cells 18-21)
-  cells.push(G(6, 0));   // 18
-  cells.push(G(6, 1));   // 19
-  cells.push(G(6, 2));   // 20
-  cells.push(G(6, 3));   // 21
-  // Green Salida (cell 22)
-  cells.push({ ...G(6, 4), salida: 2 }); // 22
-  // Continue down (cell 23)
-  cells.push(G(6, 5));   // 23
+  // ===== 10-16: Vers la DROITE (row 9, bras DROIT côté bas) =====
+  add(11, 9);     // 10
+  add(12, 9);     // 11
+  add(13, 9);     // 12 ★ SEGURO
+  add(14, 9);     // 13
+  add(15, 9);     // 14
+  add(16, 9);     // 15
+  add(16, 8);     // 16
 
-  // === SECTION 3: LEFT ARM (Yellow's territory) ===
-  // Top edge of left arm, going left (cells 24-28)
-  cells.push(G(5, 6));   // 24
-  cells.push(G(4, 6));   // 25
-  cells.push(G(3, 6));   // 26
-  cells.push(G(2, 6));   // 27
-  cells.push(G(1, 6));   // 28
-  // Left corner (cell 29) - seguro
-  cells.push(G(0, 6));   // 29 - seguro
-  // Left edge going down (cells 30-33)
-  cells.push(G(0, 7));   // 30
-  cells.push(G(0, 8));   // 31
-  cells.push(G(1, 8));   // 32
-  cells.push(G(2, 8));   // 33
-  // Bottom edge of left arm, going right (cells 34-38)
-  cells.push(G(3, 8));   // 34 - seguro
-  cells.push(G(4, 8));   // 35
-  cells.push(G(5, 8));   // 36
+  // ===== 17: Coin DROIT =====
+  add(16, 7);     // 17 ★ SEGURO
 
-  // === SECTION 4: BOTTOM ARM (Blue's territory) ===
-  // Left edge of bottom arm, going down (cells 37-38)
-  cells.push(G(6, 9));   // 37
-  cells.push(G(6, 10));  // 38
-  // Yellow Salida (cell 39)
-  cells.push({ ...G(6, 11), salida: 3 }); // 39
-  // Continue down (cells 40-42)
-  cells.push(G(6, 12));  // 40
-  cells.push(G(6, 13));  // 41
-  cells.push(G(6, 14));  // 42
-  // Bottom corner transition (cells 43-45)
-  cells.push(G(7, 14));  // 43
-  cells.push(G(8, 14));  // 44
-  cells.push(G(8, 13));  // 45
-  // Right edge of bottom arm, going up (cells 46-50)
-  cells.push(G(8, 12));  // 46 - seguro
-  cells.push(G(8, 11));  // 47
-  cells.push(G(8, 10));  // 48
-  cells.push(G(8, 9));   // 49
+  // ===== 18-24: Vers la GAUCHE (row 7, bras DROIT côté haut) =====
+  add(15, 7);     // 18
+  add(14, 7);     // 19
+  add(13, 7);     // 20
+  add(12, 7);     // 21
+  add(11, 7, 1);  // 22 ★ SALIDA Blue
+  add(10, 7);     // 23
+  add(9, 6);      // 24
 
-  // === SECTION 5: Complete the loop back to start ===
-  // Bottom edge going right, connecting back (cells 50-55)
-  cells.push(G(9, 8));   // 50 - note: same as cell 0, this is the wraparound point
-  // Instead, continue on different row to avoid overlap
-  // Let me recalculate...
+  // ===== 25-26: COIN partagé (jonction DROIT → HAUT) =====
+  addSharedCorner(9, 5, true, 'vertical');   // 25
+  addSharedCorner(9, 5, false, 'vertical');  // 26
 
-  // Actually for Parques, cell 50 continues on inner track
-  // The path should be:
-  // After cell 49 (8, 9), continue right on row 9
-  cells.push(G(9, 9));   // 50
-  cells.push(G(10, 9));  // 51
-  cells.push(G(11, 9));  // 52
-  cells.push(G(12, 9));  // 53
-  cells.push(G(13, 9));  // 54
-  cells.push(G(14, 9));  // 55
-  // Blue Salida (cell 56)
-  cells.push({ ...G(14, 8), salida: 1 }); // 56
-  // Inner path going back (cells 57-62)
-  cells.push(G(13, 8));  // 57 - note: overlaps with cell 4
-  cells.push(G(12, 8));  // 58
-  cells.push(G(11, 8));  // 59
-  cells.push(G(10, 8));  // 60
-  cells.push(G(9, 8));   // 61
-  cells.push(G(9, 7));   // 62
+  // ===== 27-33: Vers le HAUT (col 9 → coin → col 7, bras HAUT) =====
+  add(9, 4);      // 27
+  add(9, 3);      // 28
+  add(9, 2);      // 29 ★ SEGURO
+  add(9, 1);      // 30
+  add(9, 0);      // 31
+  add(8, 0);      // 32
+  add(7, 0);      // 33
 
-  // Final cells (63-67)
-  cells.push(G(9, 6));   // 63 - seguro (overlaps with 10)
-  cells.push(G(10, 6));  // 64
-  cells.push(G(11, 6));  // 65
-  cells.push(G(12, 6));  // 66
-  cells.push(G(13, 6));  // 67
+  // ===== 34: Coin HAUT =====
+  add(7, 1);      // 34 ★ SEGURO
 
-  return cells.slice(0, 68);
+  // ===== 35-41: Vers le BAS (col 7 → row 7, bras HAUT côté gauche) =====
+  add(7, 2);      // 35
+  add(7, 3);      // 36
+  add(7, 4);      // 37
+  add(7, 5);      // 38
+  add(7, 6, 0);   // 39 ★ SALIDA Red
+  add(6, 7);      // 40
+  add(5, 7);      // 41
+
+  // ===== 42-43: COIN partagé (jonction HAUT → GAUCHE) =====
+  addSharedCorner(4, 7, true, 'horizontal');   // 42
+  addSharedCorner(4, 7, false, 'horizontal');  // 43
+
+  // ===== 44-50: Vers la GAUCHE (row 7 → col 0 → row 9, bras GAUCHE) =====
+  add(3, 7);      // 44
+  add(2, 7);      // 45
+  add(1, 7);      // 46 ★ SEGURO
+  add(0, 7);      // 47
+  add(0, 8);      // 48
+  add(0, 9);      // 49
+  add(1, 9);      // 50
+
+  // ===== 51: Coin GAUCHE =====
+  add(2, 9);      // 51 ★ SEGURO
+
+  // ===== 52-58: Vers la DROITE (row 9 → col 7, bras GAUCHE côté bas) =====
+  add(3, 9);      // 52
+  add(4, 9);      // 53
+  add(5, 9);      // 54
+  add(6, 9, 2);   // 55
+  add(7, 10);     // 56 ★ SALIDA Green
+  add(7, 11);     // 57
+  add(7, 12);     // 58
+
+  // ===== 59-60: COIN partagé (jonction GAUCHE → BAS) =====
+  addSharedCorner(7, 13, true, 'vertical');   // 59
+  addSharedCorner(7, 13, false, 'vertical');  // 60
+
+  // ===== 61-67: Vers le BAS (col 7 → row 16, bras BAS côté gauche) =====
+  add(7, 14);     // 61
+  add(7, 15);     // 62
+  add(7, 16);     // 63 ★ SEGURO
+  add(6, 16);     // 64
+  add(5, 16);     // 65
+  add(4, 16);     // 66
+  add(3, 16);     // 67
+
+  // ===== 68: Case finale =====
+  add(8, 8);      // 68 ★ SEGURO - CENTRE
+
+  return cells;
 }
 
 function BoardBackground() {
-  const cornerSize = 6 * CELL;
-  const armWidth = 3 * CELL;
+  const cornerSize = 7 * CELL; // 7 cells for 17x17 grid
+  const armWidth = 3 * CELL;   // 3 cells wide (cols 7-9 or rows 7-9)
 
   return (
     <g>
@@ -181,17 +191,17 @@ function BoardBackground() {
       <rect x={cornerSize} y={0} width={armWidth} height={SIZE} fill="#DEB887" stroke="#8B4513" strokeWidth={1} />
       <rect x={0} y={cornerSize} width={SIZE} height={armWidth} fill="#DEB887" stroke="#8B4513" strokeWidth={1} />
 
-      {/* Corners */}
+      {/* Corners - 4 colored zones */}
       <rect x={10} y={10} width={cornerSize - 10} height={cornerSize - 10} fill={PLAYER_COLORS[2].main} stroke={PLAYER_COLORS[2].dark} strokeWidth={2} />
       <rect x={SIZE - cornerSize} y={10} width={cornerSize - 10} height={cornerSize - 10} fill={PLAYER_COLORS[0].main} stroke={PLAYER_COLORS[0].dark} strokeWidth={2} />
       <rect x={10} y={SIZE - cornerSize} width={cornerSize - 10} height={cornerSize - 10} fill={PLAYER_COLORS[3].main} stroke={PLAYER_COLORS[3].dark} strokeWidth={2} />
       <rect x={SIZE - cornerSize} y={SIZE - cornerSize} width={cornerSize - 10} height={cornerSize - 10} fill={PLAYER_COLORS[1].main} stroke={PLAYER_COLORS[1].dark} strokeWidth={2} />
 
-      {/* Llegada paths (center strip of each arm) */}
-      <rect x={7 * CELL} y={cornerSize} width={CELL} height={cornerSize - CELL} fill={PLAYER_COLORS[2].light} stroke={PLAYER_COLORS[2].dark} strokeWidth={1} />
-      <rect x={cornerSize + CELL} y={7 * CELL} width={cornerSize - CELL} height={CELL} fill={PLAYER_COLORS[0].light} stroke={PLAYER_COLORS[0].dark} strokeWidth={1} />
-      <rect x={7 * CELL} y={cornerSize + armWidth} width={CELL} height={cornerSize - CELL} fill={PLAYER_COLORS[1].light} stroke={PLAYER_COLORS[1].dark} strokeWidth={1} />
-      <rect x={cornerSize} y={7 * CELL} width={cornerSize - CELL} height={CELL} fill={PLAYER_COLORS[3].light} stroke={PLAYER_COLORS[3].dark} strokeWidth={1} />
+      {/* Llegada paths (center strip of each arm - col 8 or row 8) */}
+      <rect x={8 * CELL} y={cornerSize} width={CELL} height={cornerSize - CELL} fill={PLAYER_COLORS[2].light} stroke={PLAYER_COLORS[2].dark} strokeWidth={1} />
+      <rect x={cornerSize + CELL} y={8 * CELL} width={cornerSize - CELL} height={CELL} fill={PLAYER_COLORS[0].light} stroke={PLAYER_COLORS[0].dark} strokeWidth={1} />
+      <rect x={8 * CELL} y={cornerSize + armWidth} width={CELL} height={cornerSize - CELL} fill={PLAYER_COLORS[1].light} stroke={PLAYER_COLORS[1].dark} strokeWidth={1} />
+      <rect x={cornerSize} y={8 * CELL} width={cornerSize - CELL} height={CELL} fill={PLAYER_COLORS[3].light} stroke={PLAYER_COLORS[3].dark} strokeWidth={1} />
 
       {/* Center */}
       <rect x={cornerSize} y={cornerSize} width={armWidth} height={armWidth} fill="#2C1810" stroke="#FFD700" strokeWidth={2} />
@@ -218,8 +228,9 @@ function PathCells({
   return (
     <g>
       {positions.map((pos, index) => {
+        const cellNumber = pos.cellNumber;
         const isHighlighted = highlightedCells.includes(index);
-        const isSeguro = BOARD_CONFIG.SEGUROS.includes(index);
+        const isSeguro = BOARD_CONFIG.SEGUROS.includes(cellNumber);
         const isSalida = pos.salida !== undefined;
         const pawns = pawnsOnCells[index] || [];
 
@@ -236,11 +247,47 @@ function PathCells({
           fill = "#8B5A2B";
         }
 
+        // Determine if we should show the number (hide when pawn is present)
+        const showNumber = pawns.length === 0;
+
         return (
           <g key={index} transform={`translate(${pos.x}, ${pos.y})`} onClick={() => onCellClick(index)} className={styles.cellGroup}>
             <rect x={-CELL / 2 + 1} y={-CELL / 2 + 1} width={CELL - 2} height={CELL - 2} fill={fill} stroke={stroke} strokeWidth={isHighlighted ? 2 : 1} />
-            {isSeguro && !isSalida && <text x={0} y={3} textAnchor="middle" fontSize={12} fill="#FFD700">★</text>}
-            {isSalida && pos.salida !== undefined && <text x={0} y={4} textAnchor="middle" fontSize={10} fill={PLAYER_COLORS[pos.salida as keyof typeof PLAYER_COLORS].dark} fontWeight="bold">S</text>}
+            
+            {/* Cell number */}
+            {showNumber && (
+              <text 
+                x={0} 
+                y={4} 
+                textAnchor="middle" 
+                fontSize={isSeguro ? 9 : 10} 
+                fill={isSeguro ? "#FFD700" : "#5D3A1A"}
+                fontWeight="bold"
+                style={{ fontFamily: "Arial, sans-serif" }}
+              >
+                {cellNumber}
+              </text>
+            )}
+            
+            {/* Seguro star indicator (small, in corner) */}
+            {isSeguro && !isSalida && showNumber && (
+              <text x={CELL/2 - 8} y={-CELL/2 + 10} textAnchor="middle" fontSize={8} fill="#FFD700">★</text>
+            )}
+            
+            {/* Salida circle indicator */}
+            {isSalida && pos.salida !== undefined && (
+              <circle 
+                cx={0} 
+                cy={0} 
+                r={CELL / 2 - 4} 
+                fill="none" 
+                stroke={PLAYER_COLORS[pos.salida as keyof typeof PLAYER_COLORS].dark} 
+                strokeWidth={2}
+                opacity={0.6}
+              />
+            )}
+            
+            {/* Pawns */}
             {pawns.map((pawn, i) => (
               <g key={`${pawn.playerId}-${pawn.pawnId}`} transform={`translate(${(i % 2) * 10 - 5}, ${Math.floor(i / 2) * 10 - 5})`} onClick={(e) => { e.stopPropagation(); onPawnClick(pawn.playerId, pawn.pawnId); }}>
                 <Pawn color={pawn.color} size={22} isSelected={pawn.isSelected} isMovable={pawn.isMovable} />
@@ -270,7 +317,7 @@ function PrisonZones({
   canExitPrison: boolean;
   onPawnClick: (playerId: string, pawnId: number) => void;
 }) {
-  const cornerSize = 6 * CELL;
+  const cornerSize = 7 * CELL; // 7 cells for 17x17 grid
   const cornerConfigs = [
     { playerIndex: 0, x: SIZE - cornerSize / 2 - 5, y: cornerSize / 2 + 5 },
     { playerIndex: 1, x: SIZE - cornerSize / 2 - 5, y: SIZE - cornerSize / 2 - 5 },
@@ -330,12 +377,13 @@ function LlegadaPaths({
   canSelectPawn: boolean;
   onPawnClick: (playerId: string, pawnId: number) => void;
 }) {
-  const cornerSize = 6 * CELL;
+  const cornerSize = 7 * CELL; // 7 cells for 17x17 grid
+  // Llegada paths start at col/row 8 (center of the arm)
   const configs = [
-    { playerIndex: 0, startX: SIZE - cornerSize - CELL / 2, startY: 7 * CELL + CELL / 2, dx: -1, dy: 0 },
-    { playerIndex: 1, startX: 7 * CELL + CELL / 2, startY: SIZE - cornerSize - CELL / 2, dx: 0, dy: -1 },
-    { playerIndex: 2, startX: 7 * CELL + CELL / 2, startY: cornerSize + CELL / 2, dx: 0, dy: 1 },
-    { playerIndex: 3, startX: cornerSize + CELL / 2, startY: 7 * CELL + CELL / 2, dx: 1, dy: 0 },
+    { playerIndex: 0, startX: SIZE - cornerSize - CELL / 2, startY: 8 * CELL + CELL / 2, dx: -1, dy: 0 },
+    { playerIndex: 1, startX: 8 * CELL + CELL / 2, startY: SIZE - cornerSize - CELL / 2, dx: 0, dy: -1 },
+    { playerIndex: 2, startX: 8 * CELL + CELL / 2, startY: cornerSize + CELL / 2, dx: 0, dy: 1 },
+    { playerIndex: 3, startX: cornerSize + CELL / 2, startY: 8 * CELL + CELL / 2, dx: 1, dy: 0 },
   ];
 
   return (
